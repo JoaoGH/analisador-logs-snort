@@ -55,8 +55,52 @@ public:
 };
 
 int main() {
+	int opc;
 	// todo caminho do arquivo
 	Sistema *sistema = new Sistema("");
-	cout << "teste";
+
+	while (1) {
+		system("cls");
+		cout << "1 - Adicionar filtro" << endl;
+		cout << "2 - Limpar filtros" << endl;
+		cout << "3 - Visualizar filtros" << endl;
+		cout << "4 - Visualizar dados" << endl;
+		cout << "5 - Exportar dados" << endl;
+		cin >> opc;
+
+		switch (opc) {
+			case 1:
+				cout << "Adicionar filtro" << endl;
+				system("pause");
+				break;
+			case 2:
+				cout << "Limpar filtros" << endl;
+				system("pause");
+				break;
+			case 3:
+				cout << "Visualizar filtros" << endl;
+				system("pause");
+				break;
+			case 4:
+				cout << "Visualizar dados" << endl;
+				system("pause");
+				break;
+			case 5:
+				cout << "Exportar dados" << endl;
+				system("pause");
+				break;
+			default:
+				cout << "Invalida" << endl;
+				system("pause");
+				break;
+
+		}
+
+	}
+
+
+
+
+	system("pause");
 	return 0;
 }
