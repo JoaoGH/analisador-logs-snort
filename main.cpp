@@ -75,6 +75,7 @@ private:
 	int origemPorta;
 	string destinoIP;
 	int destinoPorta;
+	bool filtro;
 
 public:
 	Registro(string linha) {
@@ -133,7 +134,8 @@ public:
 		if (temp.find(':') != string::npos) {
 			this->destinoPorta = this->getPortFromLine(temp);
 		}
-		cout << "end" << endl;
+
+		this->filtro = true;
 	}
 
 	/**
@@ -169,10 +171,61 @@ public:
 		return atoi(line.substr(line.find(':') + 1).c_str());
 	}
 
+	DataHora *getDataHora() {
+		return this->dataHora;
+	}
+
+	string getCodigo() {
+		return this->codigo;
+	}
+
+	string getMensagem() {
+		return this->mensagem;
+	}
+
+	string getClassificacao() {
+		return this->classificacao;
+	}
+
+	int getPrioridade() {
+		return this->prioridade;
+	}
+
+	string getProtocolo() {
+		return this->protocolo;
+	}
+
+	string getOrigemIP() {
+		return this->origemIP;
+	}
+
+	int getOrigemPorta() {
+		return this->origemPorta;
+	}
+
+	string getDestinoIP() {
+		return this->destinoIP;
+	}
+
+	int getDestinoPorta() {
+		return this->destinoPorta;
+	}
+
+	void setFiltro(bool status) {
+		this->filtro = status;
+	}
+
+	bool getFiltro() {
+		return this->filtro;
+	}
+
 };
 
 class Sistema {
 	vector<Registro *> logs;
+	// Filtros
+	string dataInicial = "", dataFinal = "", horaInicial = "", horaFinal = "", codigo = "", mensagem = "", classificacao = "", protocolo = "", origemIP = "", destinoIP = "";
+	// todo filtros inteiros: prioridade, porta origem e porta destino - pode ser valor exato ou intervalo
 public:
 	Sistema(string nomeArquivo) {
 		fstream arq;
@@ -191,18 +244,200 @@ public:
 		}
 	}
 
-	~Sistema() {};
-
-	int getTotal() {
-		return this->logs.size();
+	vector<Registro *> getLogsValidos() {
+		vector<Registro *> logsValidos;
+		for (vector<Registro *>::iterator it = this->logs.begin(); it != this->logs.end(); ++it) {
+			if ((*it)->getFiltro()) {
+				logsValidos.push_back(*it);
+			}
+		}
+		return logsValidos;
 	}
+
+	void filtroData(string data1, string data2) {
+		// todo, corrigir a classe DataHora. ta invalida
+	}
+
+	void filtroHora(string hora1, string hora2) {
+		// todo, corrigir a classe DataHora. ta invalida
+	}
+
+	/**
+	 * Metodo responsavel por validar se o codigo informado e diferente do codigo do registro.
+	 * Aplicando o valor false no atributo filtro
+	 * */
+	void filtroCodigo(string codigo) {
+		codigo = this->toUpper(codigo);
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (this->toUpper((*it)->getCodigo()) != codigo) {
+				(*it)->setFiltro(false);
+			}
+		}
+	}
+
+	/**
+	 * Metodo responsavel por validar se a mensagem informada e diferente da mensagem do registro.
+	 * Aplicando o valor false no atributo filtro
+	 * */
+	void filtroMensagem(string mensagem) {
+		mensagem = this->toUpper(mensagem);
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (this->toUpper((*it)->getMensagem()) != mensagem) {
+				(*it)->setFiltro(false);
+			}
+		}
+	}
+
+	/**
+	 * Metodo responsavel por validar se a classificacao informado e diferente a classificacao do registro.
+	 * Aplicando o valor false no atributo filtro
+	 * */
+	void filtroClassificacao(string classificacao) {
+		classificacao = this->toUpper(classificacao);
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (this->toUpper((*it)->getClassificacao()) != classificacao) {
+				(*it)->setFiltro(false);
+			}
+		}
+	}
+
+	/**
+	 * Metodo responsavel por validar se o protocolo informado e diferente o protocolo do registro.
+	 * Aplicando o valor false no atributo filtro
+	 * */
+	void filtroProtocolo(string protocolo) {
+		protocolo = this->toUpper(protocolo);
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (this->toUpper((*it)->getProtocolo()) != protocolo) {
+				(*it)->setFiltro(false);
+			}
+		}
+	}
+
+	/**
+	 * Metodo responsavel por validar se o endereco IP de origem informado e diferente o endereco IP de origem do registro.
+	 * Aplicando o valor false no atributo filtro
+	 * */
+	void filtroOrigemIP(string origemIP) {
+		origemIP = this->toUpper(origemIP);
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (this->toUpper((*it)->getOrigemIP()) != origemIP) {
+				(*it)->setFiltro(false);
+			}
+		}
+	}
+
+	/**
+	 * Metodo responsavel por validar se o endereco IP de destino informado e diferente o endereco IP de destino do registro.
+	 * Aplicando o valor false no atributo filtro
+	 * */
+	void filtroDestinoIP(string destinoIP) {
+		destinoIP = this->toUpper(destinoIP);
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (this->toUpper((*it)->getDestinoIP()) != destinoIP) {
+				(*it)->setFiltro(false);
+			}
+		}
+	}
+
+	/**
+	 * Metodo responsavel por deixar uma string em capslock para facilitar o filtro
+	 * */
+	string toUpper(string param) {
+		string up = "";
+		for (int i = 0; i < param.size(); i++) {
+			up += toupper(param[i]);
+		}
+		return up;
+	}
+
+	void aplicaFiltros() {
+		int filtroOpc;
+		cout << "Selecione o filtro: " << endl;
+		cout << "  1 - Data" << endl;
+		cout << "  2 - Hora" << endl;
+		cout << "  3 - Codigo" << endl;
+		cout << "  4 - Mensagem" << endl;
+		cout << "  5 - Classificacao" << endl;
+		cout << "  6 - Prioridade" << endl;
+		cout << "  7 - Protocolo" << endl;
+		cout << "  8 - Endereço IP de origem" << endl;
+		cout << "  9 - Porta de origem" << endl;
+		cout << " 10 - Endereço IP de destino" << endl;
+		cout << " 11 - Porta de destino" << endl;
+		cin >> filtroOpc;
+		switch(filtroOpc) {
+			case 1:
+				cout << "Informe a data inicial " << endl;
+				getline(cin, dataInicial);
+				cout << "Informe a data final " << endl;
+				getline(cin, dataFinal);
+				this->filtroData(dataInicial, dataFinal);
+				break;
+			case 2:
+				cout << "Informe a hora inicial " << endl;
+				getline(cin, horaInicial);
+				cout << "Informe a hora final " << endl;
+				getline(cin, horaFinal);
+				this->filtroHora(horaInicial, horaFinal);
+				break;
+			case 3:
+				cout << "Informe o codigo " << endl;
+				getline(cin, codigo);
+				this->filtroCodigo(codigo);
+				break;
+			case 4:
+				cout << "Informe a mensagem " << endl;
+				getline(cin, mensagem);
+				this->filtroMensagem(mensagem);
+				break;
+			case 5:
+				cout << "Informe a classificacao " << endl;
+				getline(cin, classificacao);
+				this->filtroClassificacao(classificacao);
+				break;
+			case 6:
+				//todo prioridade
+				break;
+			case 7:
+				cout << "Informe o protocolo " << endl;
+				getline(cin, protocolo);
+				this->filtroProtocolo(protocolo);
+				break;
+			case 8:
+				cout << "Informe o endereco IP de origem" << endl;
+				getline(cin, origemIP);
+				this->filtroOrigemIP(origemIP);
+				break;
+			case 9:
+				//todo porta origem
+				break;
+			case 10:
+				cout << "Informe o endereco IP de destino" << endl;
+				getline(cin, destinoIP);
+				this->filtroDestinoIP(destinoIP);
+				break;
+			case 11:
+				//todo porta destino
+				break;
+			default:
+				break;
+		}
+	}
+
+	~Sistema() {};
 
 };
 
 int main() {
 	int opc;
 	Sistema *sistema = new Sistema("snortsyslog");
-	cout << sistema->getTotal() << endl;
 	system("pause");
 
 	while (1) {
@@ -216,7 +451,7 @@ int main() {
 
 		switch (opc) {
 			case 1:
-				cout << "Adicionar filtro" << endl;
+				sistema->aplicaFiltros();
 				system("pause");
 				break;
 			case 2:
