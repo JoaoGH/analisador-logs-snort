@@ -375,30 +375,37 @@ public:
 		switch(filtroOpc) {
 			case 1:
 				cout << "Informe a data inicial " << endl;
+				cin.ignore();
 				getline(cin, dataInicial);
 				cout << "Informe a data final " << endl;
+				cin.ignore();
 				getline(cin, dataFinal);
 				this->filtroData(dataInicial, dataFinal);
 				break;
 			case 2:
 				cout << "Informe a hora inicial " << endl;
+				cin.ignore();
 				getline(cin, horaInicial);
 				cout << "Informe a hora final " << endl;
+				cin.ignore();
 				getline(cin, horaFinal);
 				this->filtroHora(horaInicial, horaFinal);
 				break;
 			case 3:
 				cout << "Informe o codigo " << endl;
+				cin.ignore();
 				getline(cin, codigo);
 				this->filtroCodigo(codigo);
 				break;
 			case 4:
 				cout << "Informe a mensagem " << endl;
+				cin.ignore();
 				getline(cin, mensagem);
 				this->filtroMensagem(mensagem);
 				break;
 			case 5:
 				cout << "Informe a classificacao " << endl;
+				cin.ignore();
 				getline(cin, classificacao);
 				this->filtroClassificacao(classificacao);
 				break;
@@ -407,11 +414,13 @@ public:
 				break;
 			case 7:
 				cout << "Informe o protocolo " << endl;
+				cin.ignore();
 				getline(cin, protocolo);
 				this->filtroProtocolo(protocolo);
 				break;
 			case 8:
 				cout << "Informe o endereco IP de origem" << endl;
+				cin.ignore();
 				getline(cin, origemIP);
 				this->filtroOrigemIP(origemIP);
 				break;
@@ -420,6 +429,7 @@ public:
 				break;
 			case 10:
 				cout << "Informe o endereco IP de destino" << endl;
+				cin.ignore();
 				getline(cin, destinoIP);
 				this->filtroDestinoIP(destinoIP);
 				break;
@@ -438,7 +448,6 @@ public:
 int main() {
 	int opc;
 	Sistema *sistema = new Sistema("snortsyslog");
-	system("pause");
 
 	while (1) {
 		system("cls");
