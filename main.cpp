@@ -219,6 +219,46 @@ public:
 		return this->filtro;
 	}
 
+	void setDataHora(DataHora *dataHora) {
+		this->dataHora = dataHora;
+	}
+
+	void setCodigo(const string &codigo) {
+		this->codigo = codigo;
+	}
+
+	void setMensagem(const string &mensagem) {
+		this->mensagem = mensagem;
+	}
+
+	void setClassificacao(const string &classificacao) {
+		this->classificacao = classificacao;
+	}
+
+	void setPrioridade(int prioridade) {
+		this->prioridade = prioridade;
+	}
+
+	void setProtocolo(const string &protocolo) {
+		this->protocolo = protocolo;
+	}
+
+	void setOrigemIp(const string &origemIp) {
+		this->origemIP = origemIp;
+	}
+
+	void setOrigemPorta(int origemPorta) {
+		this->origemPorta = origemPorta;
+	}
+
+	void setDestinoIp(const string &destinoIp) {
+		this->destinoIP = destinoIp;
+	}
+
+	void setDestinoPorta(int destinoPorta) {
+		this->destinoPorta = destinoPorta;
+	}
+
 };
 
 class Sistema {
@@ -468,6 +508,17 @@ public:
 				break;
 			default:
 				break;
+		}
+	}
+
+	void visualizarDados() {
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		if (logsValidos.size() == 0) {
+			cout << "Nenhum log valido perante os filtros" << endl;
+		} else {
+			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+				// todo criar metodo na classe Registro para passar o objeto para String
+			}
 		}
 	}
 
