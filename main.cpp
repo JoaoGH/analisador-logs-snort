@@ -392,45 +392,75 @@ public:
 				this->filtroHora(horaInicial, horaFinal);
 				break;
 			case 3:
-				cout << "Informe o codigo " << endl;
-				cin.ignore();
-				getline(cin, codigo);
+				do {
+					cout << "Informe o codigo " << endl;
+					cin.ignore();
+					getline(cin, codigo);
+					if (codigo == "") {
+						cout << "Valor invalido, informe novamente!" << endl;
+					}
+				} while (codigo == "");
 				this->filtroCodigo(codigo);
 				break;
 			case 4:
-				cout << "Informe a mensagem " << endl;
-				cin.ignore();
-				getline(cin, mensagem);
+				do {
+					cout << "Informe a mensagem " << endl;
+					cin.ignore();
+					getline(cin, mensagem);
+					if (mensagem == "") {
+						cout << "Valor invalido, informe novamente!" << endl;
+					}
+				} while (mensagem == "");
 				this->filtroMensagem(mensagem);
 				break;
 			case 5:
-				cout << "Informe a classificacao " << endl;
-				cin.ignore();
-				getline(cin, classificacao);
+				do {
+					cout << "Informe a classificacao " << endl;
+					cin.ignore();
+					getline(cin, classificacao);
+					if (classificacao == "") {
+						cout << "Valor invalido, informe novamente!" << endl;
+					}
+				} while (classificacao == "");
 				this->filtroClassificacao(classificacao);
 				break;
 			case 6:
 				//todo prioridade
 				break;
 			case 7:
-				cout << "Informe o protocolo " << endl;
-				cin.ignore();
-				getline(cin, protocolo);
+				do {
+					cout << "Informe o protocolo " << endl;
+					cin.ignore();
+					getline(cin, protocolo);
+					if (protocolo == "") {
+						cout << "Valor invalido, informe novamente!" << endl;
+					}
+				} while (protocolo == "");
 				this->filtroProtocolo(protocolo);
 				break;
 			case 8:
-				cout << "Informe o endereco IP de origem" << endl;
-				cin.ignore();
-				getline(cin, origemIP);
+				do {
+					cout << "Informe o endereco IP de origem" << endl;
+					cin.ignore();
+					getline(cin, origemIP);
+					if (origemIP == "") {
+						cout << "Valor invalido, informe novamente!" << endl;
+					}
+				} while (origemIP == "");
 				this->filtroOrigemIP(origemIP);
 				break;
 			case 9:
 				//todo porta origem
 				break;
 			case 10:
-				cout << "Informe o endereco IP de destino" << endl;
-				cin.ignore();
-				getline(cin, destinoIP);
+				do {
+					cout << "Informe o endereco IP de destino" << endl;
+					cin.ignore();
+					getline(cin, destinoIP);
+					if (destinoIP == "") {
+						cout << "Valor invalido, informe novamente!" << endl;
+					}
+				} while (destinoIP == "");
 				this->filtroDestinoIP(destinoIP);
 				break;
 			case 11:
@@ -481,6 +511,8 @@ int main() {
 				break;
 			default:
 				cout << "Invalida" << endl;
+				cout << "total filtrados: " << endl;
+				cout << sistema->getLogsValidos().size() << endl;
 				system("pause");
 				break;
 
