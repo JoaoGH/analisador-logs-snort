@@ -265,7 +265,7 @@ class Sistema {
 	vector<Registro *> logs;
 	// Filtros
 	string dataInicial = "", dataFinal = "", horaInicial = "", horaFinal = "", codigo = "", mensagem = "", classificacao = "", protocolo = "", origemIP = "", destinoIP = "";
-	// todo filtros inteiros: prioridade, porta origem e porta destino - pode ser valor exato ou intervalo
+	int prioridadeIni = -1, prioridadeFin = -1, portaOrigemIni = -1, portaOrigemFin = -1, portaDestinoIni = -1, portaDestinoFin = -1;
 public:
 	Sistema(string nomeArquivo) {
 		fstream arq;
@@ -345,6 +345,63 @@ public:
 	}
 
 	/**
+	 * Metodo responsavel por validar se a prioridade informada e diferente da prioridade do registro.
+	 * Se a prioridadeFin for -1 (valor default)
+	 * */
+	 void filtroPrioridade(int prioridadeIni, int prioridadeFin) {
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (prioridadeFin == -1) {
+				if ((*it)->getPrioridade() != prioridadeIni) {
+					(*it)->setFiltro(false);
+				}
+			} else {
+				if ((*it)->getPrioridade() < prioridadeIni || (*it)->getPrioridade() > prioridadeFin) {
+					(*it)->setFiltro(false);
+				}
+			}
+		}
+	 }
+
+	/**
+	 * Metodo responsavel por validar se a porta de origem informada e diferente da prioridade do registro.
+	 * Se a portaOrigemFin for -1 (valor default)
+	 * */
+	 void filtroPortaOrigem(int portaOrigemIni, int portaOrigemFin) {
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (portaOrigemFin == -1) {
+				if ((*it)->getOrigemPorta() != portaOrigemIni) {
+					(*it)->setFiltro(false);
+				}
+			} else {
+				if ((*it)->getOrigemPorta() < portaOrigemIni || (*it)->getOrigemPorta() > portaOrigemFin) {
+					(*it)->setFiltro(false);
+				}
+			}
+		}
+	 }
+
+	/**
+	 * Metodo responsavel por validar se a porta de destino informada e diferente da prioridade do registro.
+	 * Se a portaDestinoIni for -1 (valor default)
+	 * */
+	 void filtroPortaDestino(int portaDestinoIni, int portaDestinoFin) {
+		vector<Registro *> logsValidos = this->getLogsValidos();
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			if (portaDestinoFin == -1) {
+				if ((*it)->getDestinoPorta() != portaDestinoIni) {
+					(*it)->setFiltro(false);
+				}
+			} else {
+				if ((*it)->getDestinoPorta() < portaDestinoIni || (*it)->getDestinoPorta() > portaDestinoFin) {
+					(*it)->setFiltro(false);
+				}
+			}
+		}
+	 }
+
+	/**
 	 * Metodo responsavel por validar se o protocolo informado e diferente o protocolo do registro.
 	 * Aplicando o valor false no atributo filtro
 	 * */
@@ -399,6 +456,7 @@ public:
 
 	void aplicaFiltros() {
 		int filtroOpc;
+		string intervalo;
 		cout << "Selecione o filtro: " << endl;
 		cout << "  1 - Data" << endl;
 		cout << "  2 - Hora" << endl;
@@ -465,7 +523,24 @@ public:
 				this->filtroClassificacao(classificacao);
 				break;
 			case 6:
-				//todo prioridade
+				do {
+					cout << "Informe a prioridade" << endl;
+					cin >> prioridadeIni;
+					if (prioridadeIni < 1) {
+						cout << "Valor invalido, informe novamente!" << endl;
+					} else {
+						cout << "Deseja informar uma prioridade final? ('S' ou 'N')" << endl;
+						cin >> intervalo;
+						if (toUpper(intervalo) == "S") {
+							cout << "Informe a prioridade final " << endl;
+							cin >> prioridadeFin;
+							if (prioridadeFin < 1 || prioridadeFin < prioridadeIni) {
+								cout << "Valor invalido, informe novamente!" << endl;
+							}
+						}
+					}
+				} while (prioridadeIni < 1 || (prioridadeFin < prioridadeIni && toUpper(intervalo) == "S"));
+				this->filtroPrioridade(prioridadeIni, prioridadeFin);
 				break;
 			case 7:
 				do {
@@ -490,7 +565,24 @@ public:
 				this->filtroOrigemIP(origemIP);
 				break;
 			case 9:
-				//todo porta origem
+				do {
+					cout << "Informe a porta de origem" << endl;
+					cin >> portaOrigemIni;
+					if (portaOrigemIni < 1) {
+						cout << "Valor invalido, informe novamente!" << endl;
+					} else {
+						cout << "Deseja informar uma porta de origem final? ('S' ou 'N')" << endl;
+						cin >> intervalo;
+						if (toUpper(intervalo) == "S") {
+							cout << "Informe a porta de origem final " << endl;
+							cin >> portaOrigemFin;
+							if (portaOrigemFin < 1 || portaOrigemFin < portaOrigemIni) {
+								cout << "Valor invalido, informe novamente!" << endl;
+							}
+						}
+					}
+				} while (portaOrigemIni < 1 || (portaOrigemFin < portaOrigemIni && toUpper(intervalo) == "S"));
+				this->filtroPortaOrigem(portaOrigemIni, portaOrigemFin);
 				break;
 			case 10:
 				do {
@@ -504,7 +596,24 @@ public:
 				this->filtroDestinoIP(destinoIP);
 				break;
 			case 11:
-				//todo porta destino
+				do {
+					cout << "Informe a porta de destino" << endl;
+					cin >> portaDestinoIni;
+					if (portaDestinoIni < 1) {
+						cout << "Valor invalido, informe novamente!" << endl;
+					} else {
+						cout << "Deseja informar uma porta de destino final? ('S' ou 'N')" << endl;
+						cin >> intervalo;
+						if (toUpper(intervalo) == "S") {
+							cout << "Informe a porta de destino final " << endl;
+							cin >> portaDestinoFin;
+							if (portaDestinoFin < 1 || portaDestinoFin < portaDestinoIni) {
+								cout << "Valor invalido, informe novamente!" << endl;
+							}
+						}
+					}
+				} while (portaDestinoIni < 1 || (portaDestinoFin < portaDestinoIni && toUpper(intervalo) == "S"));
+				this->filtroPortaDestino(portaDestinoIni, portaDestinoFin);
 				break;
 			default:
 				break;
@@ -553,7 +662,7 @@ int main() {
 				system("pause");
 				break;
 			case 4:
-				cout << "Visualizar dados" << endl;
+				sistema->visualizarDados();
 				system("pause");
 				break;
 			case 5:
