@@ -263,7 +263,6 @@ public:
 
 class Sistema {
 	vector<Registro *> logs;
-	// Filtros
 	string dataInicial = "", dataFinal = "", horaInicial = "", horaFinal = "", codigo = "", mensagem = "", classificacao = "", protocolo = "", origemIP = "", destinoIP = "";
 	int prioridadeIni = -1, prioridadeFin = -1, portaOrigemIni = -1, portaOrigemFin = -1, portaDestinoIni = -1, portaDestinoFin = -1;
 public:
@@ -631,6 +630,29 @@ public:
 		}
 	}
 
+	void limpaFiltros() {
+		for (vector<Registro *>::iterator it = this->logs.begin(); it != this->logs.end(); ++it) {
+			(*it)->setFiltro(true);
+		}
+
+		this->dataInicial = "";
+		this->dataFinal = "";
+		this->horaInicial = "";
+		this->horaFinal = "";
+		this->codigo = "";
+		this->mensagem = "";
+		this->classificacao = "";
+		this->protocolo = "";
+		this->origemIP = "";
+		this->destinoIP = "";
+		this->prioridadeIni = -1;
+		this->prioridadeFin = -1;
+		this->portaOrigemIni = -1;
+		this->portaOrigemFin = -1;
+		this->portaDestinoIni = -1;
+		this->portaDestinoFin = -1;
+	}
+
 	~Sistema() {};
 
 };
@@ -651,11 +673,9 @@ int main() {
 		switch (opc) {
 			case 1:
 				sistema->aplicaFiltros();
-				system("pause");
 				break;
 			case 2:
-				cout << "Limpar filtros" << endl;
-				system("pause");
+				sistema->limpaFiltros();
 				break;
 			case 3:
 				cout << "Visualizar filtros" << endl;
@@ -663,7 +683,6 @@ int main() {
 				break;
 			case 4:
 				sistema->visualizarDados();
-				system("pause");
 				break;
 			case 5:
 				cout << "Exportar dados" << endl;
