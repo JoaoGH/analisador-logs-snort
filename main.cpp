@@ -619,6 +619,73 @@ public:
 		}
 	}
 
+	/**
+	 * Método responsavel por exibir os filtros que estão populados.
+	 * */
+	void visualizarFiltros() {
+		if (this->dataInicial == "" && this->dataFinal == "" && this->horaInicial == "" && this->horaFinal == "" &&
+			this->codigo == "" && this->mensagem == "" && this->classificacao == "" && this->protocolo == "" &&
+			this->origemIP == "" && this->destinoIP == "" &&
+			this->prioridadeIni == -1 && this->prioridadeFin == -1 && this->portaOrigemIni == -1 &&
+			this->portaOrigemFin == -1 && this->portaDestinoIni == -1 && this->portaDestinoFin == -1) {
+			cout << "Sem filtros aplicados" << endl;
+		} else {
+			if (this->dataInicial != "") {
+				cout << "Data inicial: " << this->dataInicial << endl;
+				cout << "Data final: " << this->dataFinal << endl;
+			}
+
+			if (this->horaInicial != "") {
+				cout << "Hora inicial: " << this->horaInicial << endl;
+			}
+
+			if (this->codigo != "") {
+				cout << "Codigo: " << this->codigo << endl;
+			}
+
+			if (this->mensagem != "") {
+				cout << "Mensagem: " << this->mensagem << endl;
+			}
+
+			if (this->classificacao != "") {
+				cout << "Classificacao: " << this->classificacao << endl;
+			}
+
+			if (this->protocolo != "") {
+				cout << "Protocolo: " << this->protocolo << endl;
+			}
+
+			if (this->origemIP != "") {
+				cout << "IP de Origem: " << this->origemIP << endl;
+			}
+
+			if (this->destinoIP != "") {
+				cout << "IP de Destino: " << this->destinoIP << endl;
+			}
+
+			if (this->portaOrigemIni != -1 && this->portaOrigemFin == -1) {
+				cout << "Porta Origem: " << this->portaOrigemIni << endl;
+			} else if (this->portaOrigemIni != -1 && this->portaOrigemFin != -1) {
+				cout << "Porta Origem Inicial: " << this->portaOrigemIni << endl;
+				cout << "Porta Origem Final: " << this->portaOrigemFin << endl;
+			}
+
+			if (this->portaDestinoIni != -1 && this->portaDestinoFin == -1) {
+				cout << "Porta Destino: " << this->portaDestinoIni << endl;
+			} else if (this->portaDestinoIni != -1 && this->portaDestinoFin != -1) {
+				cout << "Porta Destino Inicial: " << this->portaDestinoIni << endl;
+				cout << "Porta Destino Final: " << this->portaDestinoFin << endl;
+			}
+
+			if (this->prioridadeIni != -1 && this->prioridadeFin == -1) {
+				cout << "Prioridade: " << this->prioridadeIni << endl;
+			} else if (this->prioridadeIni != -1 && this->prioridadeFin != -1) {
+				cout << "Prioridade Inicial: " << this->prioridadeIni << endl;
+				cout << "Prioridade Final: " << this->prioridadeFin << endl;
+			}
+		}
+	}
+
 	void visualizarDados() {
 		vector<Registro *> logsValidos = this->getLogsValidos();
 		if (logsValidos.size() == 0) {
@@ -678,8 +745,7 @@ int main() {
 				sistema->limpaFiltros();
 				break;
 			case 3:
-				cout << "Visualizar filtros" << endl;
-				system("pause");
+				sistema->visualizarFiltros();
 				break;
 			case 4:
 				sistema->visualizarDados();
@@ -690,8 +756,7 @@ int main() {
 				break;
 			default:
 				cout << "Invalida" << endl;
-				cout << "total filtrados: " << endl;
-				cout << sistema->getLogsValidos().size() << endl;
+				cout << "total filtrados: " << sistema->getLogsValidos().size() << endl;
 				system("pause");
 				break;
 
