@@ -453,6 +453,10 @@ public:
 		return up;
 	}
 
+	/**
+	 * Método responsavel por exibir um menu onde o usuário seleciona o filtros que será aplicado sobres os registros
+	 * carregados na classe Sistema.
+	 * */
 	void aplicaFiltros() {
 		int filtroOpc;
 		string intervalo;
