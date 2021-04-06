@@ -115,6 +115,8 @@ public:
 			getline(issLinha, temp, ':');
 			getline(issLinha, issPriority, ']');
 			this->prioridade = atoi(issPriority.c_str());
+		} else {
+			this->prioridade = NULL;
 		}
 
 		if (containsClassification || containsPriority) {
@@ -127,12 +129,16 @@ public:
 		this->origemIP = this->getIPFromLine(temp);
 		if (temp.find(':') != string::npos) {
 			this->origemPorta = this->getPortFromLine(temp);
+		} else {
+			this->origemPorta = NULL;
 		}
 		getline(issLinha, temp, ' ');
 		getline(issLinha, temp, ' ');
 		this->destinoIP = this->getIPFromLine(temp);
 		if (temp.find(':') != string::npos) {
 			this->destinoPorta = this->getPortFromLine(temp);
+		} else {
+			this->destinoPorta = NULL;
 		}
 
 		this->filtro = true;
@@ -259,6 +265,36 @@ public:
 		this->destinoPorta = destinoPorta;
 	}
 
+	/**
+	 * Metodo responsavel por transformar o Registro em uma string para ser exibida na tela.
+	 * O metodo ainda deixa a mensagem com um tamanho maximo de 30 caracteres
+	 * */
+	string toString() {
+		string content = "";
+
+		content += dataHora->toISO();
+		content += "\t";
+		content += codigo;
+		content += "\t";
+		content += this->mensagem.substr(0,30);;
+		content += "\t";
+		content += classificacao;
+		content += "\t";
+		content += to_string(prioridade); // int
+		content += "\t";
+		content += protocolo;
+		content += "\t";
+		content += origemIP;
+		content += "\t";
+		content += to_string(origemPorta); // int
+		content += "\t";
+		content += destinoIP;
+		content += "\t";
+		content += to_string(destinoPorta); // int
+
+		return content;
+	}
+
 };
 
 class Sistema {
@@ -283,6 +319,9 @@ public:
 		}
 	}
 
+	/**
+	 * Metodo responsavel por buscar todos os registros validos, ou seja, com o atributo filtro igual a true
+	 * */
 	vector<Registro *> getLogsValidos() {
 		vector<Registro *> logsValidos;
 		for (vector<Registro *>::iterator it = this->logs.begin(); it != this->logs.end(); ++it) {
@@ -346,6 +385,7 @@ public:
 	/**
 	 * Metodo responsavel por validar se a prioridade informada e diferente da prioridade do registro.
 	 * Se a prioridadeFin for -1 (valor default)
+	 * Aplicando o valor false no atributo filtro
 	 * */
 	 void filtroPrioridade(int prioridadeIni, int prioridadeFin) {
 		vector<Registro *> logsValidos = this->getLogsValidos();
@@ -365,6 +405,7 @@ public:
 	/**
 	 * Metodo responsavel por validar se a porta de origem informada e diferente da prioridade do registro.
 	 * Se a portaOrigemFin for -1 (valor default)
+	 * Aplicando o valor false no atributo filtro
 	 * */
 	 void filtroPortaOrigem(int portaOrigemIni, int portaOrigemFin) {
 		vector<Registro *> logsValidos = this->getLogsValidos();
@@ -384,6 +425,7 @@ public:
 	/**
 	 * Metodo responsavel por validar se a porta de destino informada e diferente da prioridade do registro.
 	 * Se a portaDestinoIni for -1 (valor default)
+	 * Aplicando o valor false no atributo filtro
 	 * */
 	 void filtroPortaDestino(int portaDestinoIni, int portaDestinoFin) {
 		vector<Registro *> logsValidos = this->getLogsValidos();
@@ -402,6 +444,7 @@ public:
 
 	/**
 	 * Metodo responsavel por validar se o protocolo informado e diferente o protocolo do registro.
+	 * Aplicando o valor false no atributo filtro
 	 * Aplicando o valor false no atributo filtro
 	 * */
 	void filtroProtocolo(string protocolo) {
@@ -690,17 +733,26 @@ public:
 		}
 	}
 
+	/**
+	 * Metodo responsavel por exibir todos os registros filtrados (com o atributo filtro igual a true), exibir os filtros
+	 * que foram usados e a quantidade total de registros que se encaixam nos filtros
+	 * */
 	void visualizarDados() {
 		vector<Registro *> logsValidos = this->getLogsValidos();
-		if (logsValidos.size() == 0) {
-			cout << "Nenhum log valido perante os filtros" << endl;
-		} else {
-			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-				// todo criar metodo na classe Registro para passar o objeto para String
-			}
+		cout << "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta" << endl;
+		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+			cout << (*it)->toString() << endl;
 		}
+		cout << endl;
+		cout << "Filtros:" << endl;
+		this->visualizarFiltros();
+		cout << endl;
+		cout << "Total de registros selecionados: " << logsValidos.size() << endl;
 	}
 
+	/**
+	 * Metodo responsavel por limpar os filtros passando para o valor inicial e setando o atributo filtro como true
+	 * */
 	void limpaFiltros() {
 		for (vector<Registro *>::iterator it = this->logs.begin(); it != this->logs.end(); ++it) {
 			(*it)->setFiltro(true);
@@ -768,6 +820,5 @@ int main() {
 	}
 
 
-	system("pause");
 	return 0;
 }
