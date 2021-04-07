@@ -776,6 +776,53 @@ public:
 		this->portaDestinoFin = -1;
 	}
 
+	/**
+	 * Metodo responsavel por realizar a exportacao dos registros que estao com o atributo filtro igual a true.
+	 * */
+	void exportar() {
+		string nomeArquivo;
+		fstream arquivo;
+		cout << "Insira o nome do arquivo onde deseja salvar os registros filtrados: ";
+		cin >> nomeArquivo;
+		nomeArquivo += ".txt";
+
+		arquivo.open(nomeArquivo.c_str(), fstream::out);
+
+		vector<Registro *> logsValidos = this->getLogsValidos();
+
+		if (arquivo.is_open()) {
+			cout << "Exportando..." << endl;
+			arquivo << "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta";
+			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+				arquivo << (*it)->getDataHora()->toISO() << "\t";
+				arquivo << (*it)->getCodigo() << "\t";
+				arquivo << (*it)->getMensagem() << "\t";
+				arquivo << (*it)->getClassificacao() << "\t";
+				if ((*it)->getPrioridade() != NULL) {
+					arquivo << (*it)->getPrioridade() << "\t";
+				} else {
+					arquivo << "\t";
+				}
+				arquivo << (*it)->getProtocolo() << "\t";
+				arquivo << (*it)->getOrigemIP() << "\t";
+				if ((*it)->getOrigemPorta() != NULL) {
+					arquivo << (*it)->getOrigemPorta() << "\t";
+				} else {
+					arquivo << "\t";
+				}
+				arquivo << (*it)->getDestinoIP() << "\t";
+				if ((*it)->getDestinoPorta() != NULL) {
+					arquivo << (*it)->getDestinoPorta() << "\t";
+				} else {
+					arquivo << "\t";
+				}
+				arquivo << endl;
+			}
+			arquivo.close();
+		}
+		cout << "Exportacao finalizada com sucesso." << endl;
+	}
+
 	~Sistema() {};
 
 };
@@ -807,8 +854,7 @@ int main() {
 				sistema->visualizarDados();
 				break;
 			case 5:
-				cout << "Exportar dados" << endl;
-				system("pause");
+				sistema->exportar();
 				break;
 			default:
 				cout << "Invalida" << endl;
