@@ -3,6 +3,8 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <time.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -17,8 +19,26 @@ private:
 
 public:
 
-	DataHora(string &mes, string &dia, string &horario) {
-//		this->ano = atoi(ano.c_str());
+	DataHora(int dia, int mes) {
+		this->ano = 2021;
+		this->mes = mes;
+		this->dia = dia;
+		this->hora = NULL;
+		this->minuto = NULL;
+		this->segundo = NULL;
+	}
+
+	DataHora(string &horario) {
+		this->ano = NULL;
+		this->mes = NULL;
+		this->dia = NULL;
+		this->hora = atoi(horario.substr(0, 2).c_str());
+		this->minuto = atoi(horario.substr(3, 5).c_str());
+		this->segundo = atoi(horario.substr(6).c_str());
+	}
+
+	DataHora(string &dia, string &mes, string &horario) {
+		this->ano = 2021;
 		this->mes = this->stringMonthToIntMonth(mes);
 		this->dia = atoi(dia.c_str());
 		this->hora = atoi(horario.substr(0, 2).c_str());
@@ -27,7 +47,48 @@ public:
 	}
 
 	string toISO() {
-		return "";
+		string content = "";
+
+		content += this->getDataISO();
+		content += "T";
+		content += this->getHoraISO();
+
+		return content;
+	}
+
+	string getDataISO() {
+		string content = "";
+		content += to_string(ano);
+		content += "-";
+		if (mes < 10) {
+			content += "0";
+		}
+		content += to_string(mes);
+		content += "-";
+		if (dia < 10) {
+			content += "0";
+		}
+		content += to_string(dia);
+		return content;
+	}
+
+	string getHoraISO() {
+		string content = "";
+		if (hora < 10) {
+			content += "0";
+		}
+		content += to_string(hora);
+		content += ":";
+		if (minuto < 10) {
+			content += "0";
+		}
+		content += to_string(minuto);
+		content += ":";
+		if (segundo < 10) {
+			content += "0";
+		}
+		content += to_string(segundo);
+		return content;
 	}
 
 	int stringMonthToIntMonth(string &mes) {
@@ -58,10 +119,112 @@ public:
 		}
 	}
 
+//	bool operator==(const DataHora &dados) const {
+//		// se houver data
+//		if (this->mes != NULL) {
+//			// se houver hora
+//			if (this->hora != NULL) {
+//				return (this->getTimeT() == dados.getTimeT());
+//			} else {
+//				// se for so data
+//				return (this->getTimeTData() == dados.getTimeTData());
+//			}
+//		} else {
+//			// se for so hora
+//			return (this->getTimeTHora() == dados.getTimeTHora());
+//		}
+//	}
+//
+//	bool operator>(const DataHora &dados) const {
+//		// se houver data
+//		if (this->mes != NULL) {
+//			// se houver hora
+//			if (this->hora != NULL) {
+//				return (this->getTimeT() > dados.getTimeT());
+//			} else {
+//				// se for so data
+//				return (this->getTimeTData() > dados.getTimeTData());
+//			}
+//		} else {
+//			// se for so hora
+//			return (this->getTimeTHora() > dados.getTimeTHora());
+//		}
+//	}
+//
+//	bool operator<(const DataHora &dados) const {
+//		// se houver data
+//		if (this->mes != NULL) {
+//			// se houver hora
+//			if (this->hora != NULL) {
+//				return (this->getTimeT() < dados.getTimeT());
+//			} else {
+//				// se for so data
+//				return (this->getTimeTData() < dados.getTimeTData());
+//			}
+//		} else {
+//			// se for so hora
+//			return (this->getTimeTHora() < dados.getTimeTHora());
+//		}
+//	}
+//
+//	bool operator>=(const DataHora &dados) const {
+//		// se houver data
+//		if (this->mes != NULL) {
+//			// se houver hora
+//			if (this->hora != NULL) {
+//				return (this->getTimeT() >= dados.getTimeT());
+//			} else {
+//				// se for so data
+//				return (this->getTimeTData() >= dados.getTimeTData());
+//			}
+//		} else {
+//			// se for so hora
+//			return (this->getTimeTHora() >= dados.getTimeTHora());
+//		}
+//	}
+//
+//	bool operator<=(const DataHora &dados) const {
+//		// se houver data
+//		if (this->mes != NULL) {
+//			// se houver hora
+//			if (this->hora != NULL) {
+//				return (this->getTimeT() <= dados.getTimeT());
+//			} else {
+//				// se for so data
+//				return (this->getTimeTData() <= dados.getTimeTData());
+//			}
+//		} else {
+//			// se for so hora
+//			return (this->getTimeTHora() <= dados.getTimeTHora());
+//		}
+//	}
 
-	//todo sobrecarga operadores
+	time_t getTimeTData() {
+		string data = "";
+		data += this->getDataISO();
+		data += "T00:00:00";
+		struct tm date = {};
+		stringstream issData(data);
+		time_t dt = NULL;
+		if (issData >> get_time(&date, "%Y-%m-%dT%H:%M:%S")) {
+			dt = mktime(&date);
+		}
+		return dt;
+	}
+
+	time_t getTimeTHora() {
+		string data = "2021-01-01T";
+		data += this->getHoraISO();
+		struct tm date = {};
+		stringstream issData(data);
+		time_t dt = NULL;
+		if (issData >> get_time(&date, "%Y-%m-%dT%H:%M:%S")) {
+			dt = mktime(&date);
+		}
+		return dt;
+	}
+
 };
-
 
 class Registro {
 private:
@@ -87,7 +250,7 @@ public:
 		getline(issLinha, mes, ' ');
 		getline(issLinha, dia, ' ');
 		getline(issLinha, horario, ' ');
-		this->dataHora = new DataHora(mes, dia, horario);
+		this->dataHora = new DataHora(dia, mes, horario);
 		getline(issLinha, temp, '[');
 		getline(issLinha, this->codigo, ']');
 		getline(issLinha, temp, ' ');
@@ -332,12 +495,61 @@ public:
 		return logsValidos;
 	}
 
+	/**
+	 * Metodo responsavel por fazer o filtro de data.
+	 * Foi tentado usar sobrecarga de operadores mas o trecho de codigo nao era executado, ainda se encontra na classe DataHora, mas comentado
+	 * */
 	void filtroData(string data1, string data2) {
-		// todo, corrigir a classe DataHora. ta invalida
+		int dia1, mes1, dia2, mes2;
+		dia1 = atoi(data1.substr(0,2).c_str());
+		mes1 = atoi(data1.substr(3,2).c_str());
+		dia2 = atoi(data2.substr(0,2).c_str());
+		mes2 = atoi(data2.substr(3,2).c_str());
+		DataHora *dataHora1 = new DataHora(dia1, mes1);
+		DataHora *dataHora2 = new DataHora(dia2, mes2);
+
+		if (dataHora1->getTimeTData() == dataHora2->getTimeTData()) {
+			cout << "Datas iguais, filtro nao aplicado" << endl;
+			this->dataInicial = "";
+			this->dataFinal = "";
+		} else if (dataHora1->getTimeTData() > dataHora2->getTimeTData()) {
+			cout << "Datas inicial maior que data final, filtro nao aplicado" << endl;
+			this->dataInicial = "";
+			this->dataFinal = "";
+		} else {
+			vector<Registro *> logsValidos = this->getLogsValidos();
+			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+				if ((*it)->getDataHora()->getTimeTData() < dataHora1->getTimeTData() || (*it)->getDataHora()->getTimeTData() > dataHora2->getTimeTData()) {
+					(*it)->setFiltro(false);
+				}
+			}
+		}
 	}
 
+	/**
+	 * Metodo responsavel por fazer o filtro de hora.
+	 * Foi tentado usar sobrecarga de operadores mas o trecho de codigo nao era executado, ainda se encontra na classe DataHora, mas comentado
+	 * */
 	void filtroHora(string hora1, string hora2) {
-		// todo, corrigir a classe DataHora. ta invalida
+		DataHora *dataHora1 = new DataHora(hora1);
+		DataHora *dataHora2 = new DataHora(hora2);
+
+		if (dataHora1->getTimeTHora() == dataHora2->getTimeTHora()) {
+			cout << "Horas iguais, filtro nao aplicado" << endl;
+			this->horaInicial = "";
+			this->horaFinal = "";
+		} else if (dataHora1->getTimeTHora() > dataHora2->getTimeTHora()) {
+			cout << "Horas inicial maior que hora final, filtro nao aplicado" << endl;
+			this->horaInicial = "";
+			this->horaFinal = "";
+		} else {
+			vector<Registro *> logsValidos = this->getLogsValidos();
+			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+				if ((*it)->getDataHora()->getTimeTHora() < dataHora1->getTimeTHora() || (*it)->getDataHora()->getTimeTHora() > dataHora2->getTimeTHora()) {
+					(*it)->setFiltro(false);
+				}
+			}
+		}
 	}
 
 	/**
@@ -519,20 +731,16 @@ public:
 		switch(filtroOpc) {
 			case 1:
 				cout << "Informe a data inicial " << endl;
-				cin.ignore();
-				getline(cin, dataInicial);
+				cin >> dataInicial;
 				cout << "Informe a data final " << endl;
-				cin.ignore();
-				getline(cin, dataFinal);
+				cin >> dataFinal;
 				this->filtroData(dataInicial, dataFinal);
 				break;
 			case 2:
 				cout << "Informe a hora inicial " << endl;
-				cin.ignore();
-				getline(cin, horaInicial);
+				cin >> horaInicial;
 				cout << "Informe a hora final " << endl;
-				cin.ignore();
-				getline(cin, horaFinal);
+				cin >> horaFinal;
 				this->filtroHora(horaInicial, horaFinal);
 				break;
 			case 3:
@@ -864,7 +1072,6 @@ int main() {
 
 		}
 	}
-
 
 	return 0;
 }
