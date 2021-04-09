@@ -439,7 +439,7 @@ public:
 		content += "\t";
 		content += codigo;
 		content += "\t";
-		content += this->mensagem.substr(0,30);;
+		content += this->mensagem.substr(0, 30);;
 		content += "\t";
 		content += classificacao;
 		content += "\t";
@@ -501,10 +501,10 @@ public:
 	 * */
 	void filtroData(string data1, string data2) {
 		int dia1, mes1, dia2, mes2;
-		dia1 = atoi(data1.substr(0,2).c_str());
-		mes1 = atoi(data1.substr(3,2).c_str());
-		dia2 = atoi(data2.substr(0,2).c_str());
-		mes2 = atoi(data2.substr(3,2).c_str());
+		dia1 = atoi(data1.substr(0, 2).c_str());
+		mes1 = atoi(data1.substr(3, 2).c_str());
+		dia2 = atoi(data2.substr(0, 2).c_str());
+		mes2 = atoi(data2.substr(3, 2).c_str());
 		DataHora *dataHora1 = new DataHora(dia1, mes1);
 		DataHora *dataHora2 = new DataHora(dia2, mes2);
 
@@ -519,7 +519,8 @@ public:
 		} else {
 			vector<Registro *> logsValidos = this->getLogsValidos();
 			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-				if ((*it)->getDataHora()->getTimeTData() < dataHora1->getTimeTData() || (*it)->getDataHora()->getTimeTData() > dataHora2->getTimeTData()) {
+				if ((*it)->getDataHora()->getTimeTData() < dataHora1->getTimeTData() ||
+					(*it)->getDataHora()->getTimeTData() > dataHora2->getTimeTData()) {
 					(*it)->setFiltro(false);
 				}
 			}
@@ -545,7 +546,8 @@ public:
 		} else {
 			vector<Registro *> logsValidos = this->getLogsValidos();
 			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-				if ((*it)->getDataHora()->getTimeTHora() < dataHora1->getTimeTHora() || (*it)->getDataHora()->getTimeTHora() > dataHora2->getTimeTHora()) {
+				if ((*it)->getDataHora()->getTimeTHora() < dataHora1->getTimeTHora() ||
+					(*it)->getDataHora()->getTimeTHora() > dataHora2->getTimeTHora()) {
 					(*it)->setFiltro(false);
 				}
 			}
@@ -599,7 +601,7 @@ public:
 	 * Se a prioridadeFin for -1 (valor default)
 	 * Aplicando o valor false no atributo filtro
 	 * */
-	 void filtroPrioridade(int prioridadeIni, int prioridadeFin) {
+	void filtroPrioridade(int prioridadeIni, int prioridadeFin) {
 		vector<Registro *> logsValidos = this->getLogsValidos();
 		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
 			if (prioridadeFin == -1) {
@@ -612,14 +614,14 @@ public:
 				}
 			}
 		}
-	 }
+	}
 
 	/**
 	 * Metodo responsavel por validar se a porta de origem informada e diferente da prioridade do registro.
 	 * Se a portaOrigemFin for -1 (valor default)
 	 * Aplicando o valor false no atributo filtro
 	 * */
-	 void filtroPortaOrigem(int portaOrigemIni, int portaOrigemFin) {
+	void filtroPortaOrigem(int portaOrigemIni, int portaOrigemFin) {
 		vector<Registro *> logsValidos = this->getLogsValidos();
 		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
 			if (portaOrigemFin == -1) {
@@ -632,14 +634,14 @@ public:
 				}
 			}
 		}
-	 }
+	}
 
 	/**
 	 * Metodo responsavel por validar se a porta de destino informada e diferente da prioridade do registro.
 	 * Se a portaDestinoIni for -1 (valor default)
 	 * Aplicando o valor false no atributo filtro
 	 * */
-	 void filtroPortaDestino(int portaDestinoIni, int portaDestinoFin) {
+	void filtroPortaDestino(int portaDestinoIni, int portaDestinoFin) {
 		vector<Registro *> logsValidos = this->getLogsValidos();
 		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
 			if (portaDestinoFin == -1) {
@@ -652,7 +654,7 @@ public:
 				}
 			}
 		}
-	 }
+	}
 
 	/**
 	 * Metodo responsavel por validar se o protocolo informado e diferente o protocolo do registro.
@@ -728,7 +730,7 @@ public:
 		cout << " 10 - Endereço IP de destino" << endl;
 		cout << " 11 - Porta de destino" << endl;
 		cin >> filtroOpc;
-		switch(filtroOpc) {
+		switch (filtroOpc) {
 			case 1:
 				cout << "Informe a data inicial " << endl;
 				cin >> dataInicial;
@@ -947,7 +949,9 @@ public:
 	 * */
 	void visualizarDados() {
 		vector<Registro *> logsValidos = this->getLogsValidos();
-		cout << "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta" << endl;
+		cout
+				<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta"
+				<< endl;
 		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
 			cout << (*it)->toString() << endl;
 		}
@@ -1000,7 +1004,8 @@ public:
 
 		if (arquivo.is_open()) {
 			cout << "Exportando..." << endl;
-			arquivo << "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta";
+			arquivo
+					<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta";
 			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
 				arquivo << (*it)->getDataHora()->toISO() << "\t";
 				arquivo << (*it)->getCodigo() << "\t";
