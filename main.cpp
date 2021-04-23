@@ -1072,7 +1072,6 @@ int main() {
 				break;
 			default:
 				cout << "Invalida" << endl;
-				cout << "total filtrados: " << sistema->getLogsValidos().size() << endl;
 				system("pause");
 				break;
 
