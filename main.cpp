@@ -894,6 +894,7 @@ public:
 
 			if (this->horaInicial != "") {
 				cout << "Hora inicial: " << this->horaInicial << endl;
+				cout << "Hora final:   " << this->horaFinal << endl;
 			}
 
 			if (this->codigo != "") {
