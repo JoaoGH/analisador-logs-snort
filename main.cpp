@@ -1046,8 +1046,7 @@ public:
 
 int main() {
 	int opc;
-//	Sistema *sistema = new Sistema("snortsyslog");
-	Sistema *sistema = new Sistema("snortsyslog-completo");
+	Sistema *sistema = new Sistema("snortsyslog");
 
 	while (1) {
 		system("cls");
