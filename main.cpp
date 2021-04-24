@@ -249,6 +249,9 @@ public:
 
 		getline(issLinha, mes, ' ');
 		getline(issLinha, dia, ' ');
+		if (dia == "") {
+			getline(issLinha, dia, ' ');
+		}
 		getline(issLinha, horario, ' ');
 		this->dataHora = new DataHora(dia, mes, horario);
 		getline(issLinha, temp, '[');
@@ -502,9 +505,9 @@ public:
 	void filtroData(string data1, string data2) {
 		int dia1, mes1, dia2, mes2;
 		dia1 = atoi(data1.substr(0, 2).c_str());
-		mes1 = atoi(data1.substr(3, 2).c_str());
+		mes1 = atoi(data1.substr(3, 5).c_str());
 		dia2 = atoi(data2.substr(0, 2).c_str());
-		mes2 = atoi(data2.substr(3, 2).c_str());
+		mes2 = atoi(data2.substr(3, 5).c_str());
 		DataHora *dataHora1 = new DataHora(dia1, mes1);
 		DataHora *dataHora2 = new DataHora(dia2, mes2);
 
@@ -1043,7 +1046,8 @@ public:
 
 int main() {
 	int opc;
-	Sistema *sistema = new Sistema("snortsyslog");
+//	Sistema *sistema = new Sistema("snortsyslog");
+	Sistema *sistema = new Sistema("snortsyslog-completo");
 
 	while (1) {
 		system("cls");
