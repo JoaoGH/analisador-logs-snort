@@ -1048,30 +1048,39 @@ int main() {
 	int opc;
 	Sistema *sistema = new Sistema("snortsyslog");
 
-	while (1) {
+	do {
 		system("cls");
 		cout << "1 - Adicionar filtro" << endl;
 		cout << "2 - Limpar filtros" << endl;
 		cout << "3 - Visualizar filtros" << endl;
 		cout << "4 - Visualizar dados" << endl;
 		cout << "5 - Exportar dados" << endl;
+		cout << "6 - Sair" << endl;
 		cin >> opc;
 
 		switch (opc) {
 			case 1:
 				sistema->aplicaFiltros();
+				system("pause");
 				break;
 			case 2:
 				sistema->limpaFiltros();
+				system("pause");
 				break;
 			case 3:
 				sistema->visualizarFiltros();
+				system("pause");
 				break;
 			case 4:
 				sistema->visualizarDados();
+				system("pause");
 				break;
 			case 5:
 				sistema->exportar();
+				system("pause");
+				break;
+			case 6:
+				cout << "Saindo..." << endl;
 				break;
 			default:
 				cout << "Invalida" << endl;
@@ -1079,7 +1088,7 @@ int main() {
 				break;
 
 		}
-	}
+	} while (opc != 6);
 
 	return 0;
 }
