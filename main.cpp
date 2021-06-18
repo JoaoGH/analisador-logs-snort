@@ -557,18 +557,18 @@ public:
 		head = sorted;
 	}
 
-	void sortedInsert(Node<T> *newnode) {
-		if (sorted == NULL || sorted->getElement()->getPrioridade() > newnode->getElement()->getPrioridade()) {
-			newnode->setNext(sorted);
-			sorted = newnode;
+	void sortedInsert(Node<T> *newNode) {
+		if (sorted == NULL || sorted->getElement()->getPrioridade() > newNode->getElement()->getPrioridade()) {
+			newNode->setNext(sorted);
+			sorted = newNode;
 		} else {
 			Node<T> *current = sorted;
-			while (current->getNext() != NULL && current->getNext()->getElement()->getPrioridade() <= newnode->getElement()->getPrioridade()) {
+			while (current->getNext() != NULL && current->getNext()->getElement()->getPrioridade() <= newNode->getElement()->getPrioridade()) {
 				current = current->getNext();
 			}
-			newnode->setNext(current->getNext());
-			current->setNext(newnode);
-			newnode->setPrevious(current);
+			newNode->setNext(current->getNext());
+			current->setNext(newNode);
+			newNode->setPrevious(current);
 		}
 	}
 
@@ -587,6 +587,7 @@ public:
 		}
 		return atual;
 	}
+
 	Node<T> *binarySearch(int value){
 		struct Node<T>* start = this->head;
 		struct Node<T>* last = NULL;
