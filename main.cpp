@@ -505,6 +505,7 @@ class LinkedList {
 private:
 	Node<T> *head;
 	Node<T> *tail;
+	Node<T> *sorted;
 	int length;
 public:
 	LinkedList() {
@@ -537,13 +538,81 @@ public:
 		this->length++;
 	}
 
-	Node<T>* getHead() {
+	Node<T> *getHead() {
 		return this->head;
 	}
 
-	Node<T>* getTail() {
+	Node<T> *getTail() {
 		return this->tail;
 	}
+
+	void insertionSort(string atributo) {
+		sorted = NULL;
+		Node<T> *current = head;
+		while (current != NULL) {
+			Node<T> *next = current->getNext();
+			sortedInsert(current);
+			current = next;
+		}
+		head = sorted;
+	}
+
+	void sortedInsert(Node<T> *newnode) {
+		if (sorted == NULL || sorted->getElement()->getPrioridade() > newnode->getElement()->getPrioridade()) {
+			newnode->setNext(sorted);
+			sorted = newnode;
+		} else {
+			Node<T> *current = sorted;
+			while (current->getNext() != NULL && current->getNext()->getElement()->getPrioridade() <= newnode->getElement()->getPrioridade()) {
+				current = current->getNext();
+			}
+			newnode->setNext(current->getNext());
+			current->setNext(newnode);
+			newnode->setPrevious(current);
+		}
+	}
+
+	Node<T> * getMidNode(Node<T> *start, Node<T> *last) {
+		if (start == NULL) {
+			return NULL;
+		}
+		Node<T> *atual = start;
+		Node<T> *proximo = start->getNext();
+		while (proximo != last) {
+			proximo = proximo->getNext();
+			if (proximo != last) {
+				atual = atual->getNext();
+				proximo = proximo->getNext();
+			}
+		}
+		return atual;
+	}
+	Node<T> *binarySearch(int value){
+		struct Node<T>* start = this->head;
+		struct Node<T>* last = NULL;
+		do {
+			Node<T>* mid = getMidNode(start, last);
+			if (mid == NULL)
+				return NULL;
+			if (mid->getElement()->getPrioridade() == value)
+				return mid;
+			else if (mid->getElement()->getPrioridade() < value)
+				start = mid->getNext();
+			else
+				last = mid;
+		} while (last == NULL || last != start);
+		return NULL;
+	}
+
+	void printlist() {
+		Node<Registro *> *current = head;
+		cout << "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta" << endl;
+		while (current != NULL) {
+			cout << current->getElement()->toString() << endl;
+			current = current->getNext();
+		}
+	}
+
 };
 
 class Sistema {
@@ -572,7 +641,7 @@ public:
 	/**
 	 * Metodo responsavel por buscar todos os registros validos, ou seja, com o atributo filtro igual a true
 	 * */
-	LinkedList<Registro *> * getLogsValidos() {
+	LinkedList<Registro *> *getLogsValidos() {
 		LinkedList<Registro *> *logsValidos = new LinkedList<Registro *>();
 		Node<Registro *> *current = this->logs->getHead();
 		while (current != NULL) {
@@ -637,7 +706,7 @@ public:
 		} else {
 			LinkedList<Registro *> *logsValidos = this->getLogsValidos();
 			Node<Registro *> *current = logsValidos->getHead();
-			while(current != NULL) {
+			while (current != NULL) {
 				if (current->getElement()->getDataHora()->getTimeTHora() < dataHora1->getTimeTHora() ||
 					current->getElement()->getDataHora()->getTimeTHora() > dataHora2->getTimeTHora()) {
 					current->getElement()->setFiltro(false);
@@ -655,7 +724,7 @@ public:
 		codigo = this->toUpper(codigo);
 		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
 		Node<Registro *> *current = logsValidos->getHead();
-		while(current != NULL) {
+		while (current != NULL) {
 			if (this->toUpper(current->getElement()->getCodigo()) != codigo) {
 				current->getElement()->setFiltro(false);
 			}
@@ -1061,14 +1130,7 @@ public:
 	 * */
 	void visualizarDados() {
 		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
-		Node<Registro *> *current = logsValidos->getHead();
-		cout
-				<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta"
-				<< endl;
-		while (current != NULL) {
-			cout << current->getElement()->toString() << endl;
-			current = current->getNext();
-		}
+		logsValidos->printlist();
 		cout << endl;
 		cout << "Filtros:" << endl;
 		this->visualizarFiltros();
@@ -1153,6 +1215,38 @@ public:
 		cout << "Exportacao finalizada com sucesso." << endl;
 	}
 
+	void pesquisaBinaria(int prioridade) {
+		LinkedList<Registro *> *logsFiltrados = this->getLogsValidos();
+		logsFiltrados->insertionSort("");
+		Node<Registro *> *node = logsFiltrados->binarySearch(prioridade);
+		if (node != NULL) {
+			cout << node->getElement()->toString() << endl;
+		} else {
+			cout << "nao encontrado";
+		}
+	}
+
+	void ordenarDadosFiltrados() {
+		LinkedList<Registro *> *logsFiltrados = this->getLogsValidos();
+		int tipoOrder, atributo;
+		cout << "1 - Metodo simples" << endl;
+		cout << "2 - Metodo eficiente" << endl;
+		cin >> tipoOrder;
+		switch (tipoOrder) {
+			case 1:
+				logsFiltrados->insertionSort("");
+				logsFiltrados->printlist();
+				break;
+			case 2:
+				logsFiltrados->insertionSort("");
+				logsFiltrados->printlist();
+				break;
+			default:
+				cout << "Opcao invalida" << endl;
+				break;
+		}
+	}
+
 	~Sistema() {};
 
 };
@@ -1191,13 +1285,11 @@ int main() {
 				system("pause");
 				break;
 			case 5:
-				cout << "ordenarDadosFiltrados" << endl;
-//				sistema->ordenarDadosFiltrados();
+				sistema->ordenarDadosFiltrados();
 				system("pause");
 				break;
 			case 6:
-				cout << "pesquisaBinaria" << endl;
-//				sistema->pesquisaBinaria();
+				sistema->pesquisaBinaria(2);
 				system("pause");
 				break;
 			case 7:
