@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <vector>
 #include <fstream>
 #include <sstream>
 #include <time.h>
@@ -224,6 +223,17 @@ public:
 		return dt;
 	}
 
+	time_t getTimeT() {
+		string data = this->toISO();
+		struct tm date = {};
+		stringstream issData(data);
+		time_t dt = NULL;
+		if (issData >> get_time(&date, "%Y-%m-%dT%H:%M:%S")) {
+			dt = mktime(&date);
+		}
+		return dt;
+	}
+
 };
 
 class Registro {
@@ -434,6 +444,7 @@ public:
 	/**
 	 * Metodo responsavel por transformar o Registro em uma string para ser exibida na tela.
 	 * O metodo ainda deixa a mensagem com um tamanho maximo de 30 caracteres
+	 * e seta um tamanho fixo para a coluna ser exibida
 	 * */
 	string toString() {
 		string content = "";
@@ -441,30 +452,348 @@ public:
 		content += dataHora->toISO();
 		content += "\t";
 		content += codigo;
+		if (codigo.length() < 10) {
+			for (int i = 0; i < (10 - codigo.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
-		content += this->mensagem.substr(0, 30);;
+		content += this->mensagem.substr(0, 30);
+		if (mensagem.length() < 30) {
+			for (int i = 0; i < (30 - mensagem.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += classificacao;
+		if (classificacao.length() < 30) {
+			for (int i = 0; i < (30 - classificacao.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += to_string(prioridade); // int
+		if (to_string(prioridade).length() < 10) {
+			for (int i = 0; i < (10 - to_string(prioridade).length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += protocolo;
+		if (protocolo.length() < 10) {
+			for (int i = 0; i < (10 - protocolo.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += origemIP;
+		if (origemIP.length() < 20) {
+			for (int i = 0; i < (20 - origemIP.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += to_string(origemPorta); // int
+		if (to_string(origemPorta).length() < 20) {
+			for (int i = 0; i < (20 - to_string(origemPorta).length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += destinoIP;
+		if (destinoIP.length() < 20) {
+			for (int i = 0; i < (20 - destinoIP.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += to_string(destinoPorta); // int
+		if (to_string(destinoPorta).length() < 20) {
+			for (int i = 0; i < (20 - to_string(destinoPorta).length()); i++) {
+				content += " ";
+			}
+		}
 
 		return content;
+
+	}
+
+};
+
+
+template<class T>
+class Node {
+private:
+	T element;
+	Node *next;
+	Node *previous;
+public:
+	Node(T element) {
+		this->element = element;
+		this->next = NULL;
+	}
+
+	T getElement() {
+		return this->element;
+	}
+
+	void setElement(T element) {
+		this->element = element;
+	}
+
+	Node *getNext() {
+		return this->next;
+	}
+
+	void setNext(Node *next) {
+		this->next = next;
+	}
+
+	Node *getPrevious() {
+		return this->previous;
+	}
+
+	void setPrevious(Node *previous) {
+		this->previous = previous;
+	}
+};
+
+template<class T>
+class LinkedList {
+private:
+	Node<T> *head;
+	Node<T> *tail;
+	Node<T> *sorted;
+	int length;
+public:
+	LinkedList() {
+		head = tail = 0;
+		length = 0;
+	}
+
+	bool isEmpty() {
+		return head == 0;
+	}
+
+	int size() {
+		return this->length;
+	}
+
+	void insert(T element) {
+		bool empty = this->isEmpty();
+
+		Node<T> *node = new Node<T>(element);
+
+		node->setPrevious(this->tail);
+		node->setNext(NULL);
+
+		if (empty) {
+			this->tail = this->head = node;
+		} else {
+			this->tail->setNext(node);
+			this->tail = node;
+		}
+		this->length++;
+	}
+
+	Node<T> *getHead() {
+		return this->head;
+	}
+
+	Node<T> *getTail() {
+		return this->tail;
+	}
+
+	void insertionSort(int atributo) {
+		sorted = NULL;
+		Node<T> *current = this->getHead();
+		while (current != NULL) {
+			Node<T> *next = current->getNext();
+			sortedInsert(current, atributo);
+			current = next;
+		}
+		head = sorted;
+	}
+
+	void sortedInsert(Node<T> *newNode, int atributo) {
+		if (sorted == NULL || this->testAtribute(atributo, ">", sorted->getElement(), newNode->getElement())) {
+			newNode->setNext(sorted);
+			sorted = newNode;
+		}
+		else {
+			Node<T> *current = sorted;
+			while (current->getNext() != NULL && this->testAtribute(atributo, "<=", current->getNext()->getElement(), newNode->getElement())) {
+				if (this->testAtribute(atributo, "==", current->getNext()->getElement(), newNode->getElement())) {
+					if (this->testAtribute(atributo, ">", current->getNext()->getElement(), newNode->getElement())) {
+						break;
+					}
+				}
+				current = current->getNext();
+			}
+			newNode->setNext(current->getNext());
+			current->setNext(newNode);
+		}
+	}
+
+	/**
+	 * Esse metodo e o mais confuso, ele visa comparar 2 elementos para realizar a ordenacao.
+	 * Para o funcionamento dele precisa passar o id do atributo, o tipo de comparacao desejada e os dois elementos,
+	 * com isso o metodo pega o tipo do atributo e a devidada comparcao. No caso de string eh passada prara um valor
+	 * inteiro com base no tamanho da menor string e no caso de DataHora o TimeT que eh comparado.
+	 * Certamente tem um jeito mais facil de fazer isso, mas eu nao sei... ainda.
+	 * */
+	bool testAtribute(int atributo, string testType, T element1, T element2) {
+		int tam, valor1, valor2;
+		switch (atributo) {
+			case 1:
+				// DataHora
+				valor1 = element1->getDataHora()->getTimeT();
+				valor2 = element2->getDataHora()->getTimeT();
+				break;
+			case 2:
+				// Codigo
+				tam = element1->getCodigo().size() < element2->getCodigo().size() ? element1->getCodigo().size() : element2->getCodigo().size();
+				valor1 = this->stringToIntValue(element1->getCodigo(), tam);
+				valor2 = this->stringToIntValue(element2->getCodigo(), tam);
+				break;
+			case 3:
+				// Mensagem
+				tam = element1->getMensagem().size() < element2->getMensagem().size() ? element1->getMensagem().size() : element2->getMensagem().size();
+				valor1 = this->stringToIntValue(element1->getMensagem(), tam);
+				valor2 = this->stringToIntValue(element2->getMensagem(), tam);
+				break;
+			case 4:
+				// Classificacao
+				tam = element1->getClassificacao().size() < element2->getClassificacao().size() ? element1->getClassificacao().size() : element2->getClassificacao().size();
+				valor1 = this->stringToIntValue(element1->getClassificacao(), tam);
+				valor2 = this->stringToIntValue(element2->getClassificacao(), tam);
+				break;
+			case 5:
+				// Prioridade
+				valor1 = element1->getPrioridade();
+				valor2 = element2->getPrioridade();
+				break;
+			case 6:
+				// Protocolo
+				tam = element1->getProtocolo().size() < element2->getProtocolo().size() ? element1->getProtocolo().size() : element2->getProtocolo().size();
+				valor1 = this->stringToIntValue(element1->getProtocolo(), tam);
+				valor2 = this->stringToIntValue(element2->getProtocolo(), tam);
+				break;
+			case 7:
+				// OrigemIP
+				tam = element1->getOrigemIP().size() < element2->getOrigemIP().size() ? element1->getOrigemIP().size() : element2->getOrigemIP().size();
+				valor1 = this->stringToIntValue(element1->getOrigemIP(), tam);
+				valor2 = this->stringToIntValue(element2->getOrigemIP(), tam);
+				break;
+			case 8:
+				// OrigemPorta
+				valor1 = element1->getOrigemPorta();
+				valor2 = element2->getOrigemPorta();
+				break;
+			case 9:
+				// DestinoIP
+				tam = element1->getDestinoIP().size() < element2->getDestinoIP().size() ? element1->getDestinoIP().size() : element2->getDestinoIP().size();
+				valor1 = this->stringToIntValue(element1->getDestinoIP(), tam);
+				valor2 = this->stringToIntValue(element2->getDestinoIP(), tam);
+				break;
+			case 10:
+				// DestinoPorta
+				valor1 = element1->getDestinoPorta();
+				valor2 = element2->getDestinoPorta();
+				break;
+		}
+
+		if (testType == ">") {
+			return valor1 > valor2;
+		} else if (testType == "<") {
+			return valor1 < valor2;
+		} else if (testType == "==") {
+			return valor1 == valor2;
+		} else if (testType == ">=") {
+			return valor1 >= valor2;
+		} else if (testType == "<=") {
+			return valor1 <= valor2;
+		}
+	}
+
+	Node<T> *getMidNode(Node<T> *start, Node<T> *last) {
+		if (start == NULL) {
+			return NULL;
+		}
+		Node<T> *atual = start;
+		Node<T> *proximo = start->getNext();
+		while (proximo != last) {
+			proximo = proximo->getNext();
+			if (proximo != last) {
+				atual = atual->getNext();
+				proximo = proximo->getNext();
+			}
+		}
+		return atual;
+	}
+
+	Node<T> *binarySearch(int value) {
+		struct Node<T> *start = this->head;
+		struct Node<T> *last = NULL;
+		do {
+			Node<T> *mid = getMidNode(start, last);
+			if (mid == NULL)
+				return NULL;
+			if (mid->getElement()->getPrioridade() == value)
+				return mid;
+			else if (mid->getElement()->getPrioridade() < value)
+				start = mid->getNext();
+			else
+				last = mid;
+		} while (last == NULL || last != start);
+		return NULL;
+	}
+
+	void printlist() {
+		Node<Registro *> *current = head;
+		cout
+				<< "DataHora         \t" // 20
+				<< "Codigo    \t"//10
+	   			<< "Mensagem                      \t" //30
+		  		<< "Classificacao                 \t"
+		 		<< "Prioridade\t"
+				<< "Protocolo \t"
+	   			<< "OrigemIP            \t"
+		  		<< "OrigemPorta         \t"
+		 		<< "DestinoIP           \t"
+				<< "DestinoPorta"
+				<< endl;
+		while (current != NULL) {
+			cout << current->getElement()->toString() << endl;
+			current = current->getNext();
+		}
+	}
+
+	int stringToIntValue(string s1, int byte) {
+		s1 = this->toUpper(s1);
+		int size = 0;
+		for (int i = 0; i < byte; i++) {
+			size += s1[i];
+		}
+		return size;
+	}
+
+	/**
+	 * Necessario replicar para testes de filtro de strings
+	 * */
+	string toUpper(string param) {
+		string up = "";
+		for (int i = 0; i < param.size(); i++) {
+			up += toupper(param[i]);
+		}
+		return up;
 	}
 
 };
 
 class Sistema {
-	vector<Registro *> logs;
+	LinkedList<Registro *> *logs;
+	LinkedList<Registro *> *ordenados;
 	string dataInicial = "", dataFinal = "", horaInicial = "", horaFinal = "", codigo = "", mensagem = "", classificacao = "", protocolo = "", origemIP = "", destinoIP = "";
 	int prioridadeIni = -1, prioridadeFin = -1, portaOrigemIni = -1, portaOrigemFin = -1, portaDestinoIni = -1, portaDestinoFin = -1;
 public:
@@ -472,12 +801,14 @@ public:
 		fstream arq;
 		string line;
 		arq.open(nomeArquivo.c_str(), fstream::in);
+		logs = new LinkedList<Registro *>();
+		ordenados = new LinkedList<Registro *>();
 		if (arq.is_open()) {
 			while (!arq.eof()) {
 				getline(arq, line, '\n');
 				if (line != "") {
 					Registro *record = new Registro(line);
-					logs.push_back(record);
+					logs->insert(record);
 				}
 			}
 		} else {
@@ -488,12 +819,14 @@ public:
 	/**
 	 * Metodo responsavel por buscar todos os registros validos, ou seja, com o atributo filtro igual a true
 	 * */
-	vector<Registro *> getLogsValidos() {
-		vector<Registro *> logsValidos;
-		for (vector<Registro *>::iterator it = this->logs.begin(); it != this->logs.end(); ++it) {
-			if ((*it)->getFiltro()) {
-				logsValidos.push_back(*it);
+	LinkedList<Registro *> *getLogsValidos() {
+		LinkedList<Registro *> *logsValidos = new LinkedList<Registro *>();
+		Node<Registro *> *current = this->logs->getHead();
+		while (current != NULL) {
+			if (current->getElement()->getFiltro()) {
+				logsValidos->insert(current->getElement());
 			}
+			current = current->getNext();
 		}
 		return logsValidos;
 	}
@@ -520,12 +853,14 @@ public:
 			this->dataInicial = "";
 			this->dataFinal = "";
 		} else {
-			vector<Registro *> logsValidos = this->getLogsValidos();
-			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-				if ((*it)->getDataHora()->getTimeTData() < dataHora1->getTimeTData() ||
-					(*it)->getDataHora()->getTimeTData() > dataHora2->getTimeTData()) {
-					(*it)->setFiltro(false);
+			LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+			Node<Registro *> *current = logsValidos->getHead();
+			while (current != NULL) {
+				if (current->getElement()->getDataHora()->getTimeTData() < dataHora1->getTimeTData() ||
+					current->getElement()->getDataHora()->getTimeTData() > dataHora2->getTimeTData()) {
+					current->getElement()->setFiltro(false);
 				}
+				current = current->getNext();
 			}
 		}
 	}
@@ -547,12 +882,14 @@ public:
 			this->horaInicial = "";
 			this->horaFinal = "";
 		} else {
-			vector<Registro *> logsValidos = this->getLogsValidos();
-			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-				if ((*it)->getDataHora()->getTimeTHora() < dataHora1->getTimeTHora() ||
-					(*it)->getDataHora()->getTimeTHora() > dataHora2->getTimeTHora()) {
-					(*it)->setFiltro(false);
+			LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+			Node<Registro *> *current = logsValidos->getHead();
+			while (current != NULL) {
+				if (current->getElement()->getDataHora()->getTimeTHora() < dataHora1->getTimeTHora() ||
+					current->getElement()->getDataHora()->getTimeTHora() > dataHora2->getTimeTHora()) {
+					current->getElement()->setFiltro(false);
 				}
+				current = current->getNext();
 			}
 		}
 	}
@@ -563,11 +900,13 @@ public:
 	 * */
 	void filtroCodigo(string codigo) {
 		codigo = this->toUpper(codigo);
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-			if (this->toUpper((*it)->getCodigo()) != codigo) {
-				(*it)->setFiltro(false);
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
+			if (this->toUpper(current->getElement()->getCodigo()) != codigo) {
+				current->getElement()->setFiltro(false);
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -577,11 +916,13 @@ public:
 	 * */
 	void filtroMensagem(string mensagem) {
 		mensagem = this->toUpper(mensagem);
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-			if (this->toUpper((*it)->getMensagem()) != mensagem) {
-				(*it)->setFiltro(false);
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
+			if (this->toUpper(current->getElement()->getMensagem()) != mensagem) {
+				current->getElement()->setFiltro(false);
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -591,11 +932,13 @@ public:
 	 * */
 	void filtroClassificacao(string classificacao) {
 		classificacao = this->toUpper(classificacao);
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-			if (this->toUpper((*it)->getClassificacao()) != classificacao) {
-				(*it)->setFiltro(false);
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
+			if (this->toUpper(current->getElement()->getClassificacao()) != classificacao) {
+				current->getElement()->setFiltro(false);
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -605,17 +948,20 @@ public:
 	 * Aplicando o valor false no atributo filtro
 	 * */
 	void filtroPrioridade(int prioridadeIni, int prioridadeFin) {
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
 			if (prioridadeFin == -1) {
-				if ((*it)->getPrioridade() != prioridadeIni) {
-					(*it)->setFiltro(false);
+				if (current->getElement()->getPrioridade() != prioridadeIni) {
+					current->getElement()->setFiltro(false);
 				}
 			} else {
-				if ((*it)->getPrioridade() < prioridadeIni || (*it)->getPrioridade() > prioridadeFin) {
-					(*it)->setFiltro(false);
+				if (current->getElement()->getPrioridade() < prioridadeIni ||
+					current->getElement()->getPrioridade() > prioridadeFin) {
+					current->getElement()->setFiltro(false);
 				}
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -625,17 +971,20 @@ public:
 	 * Aplicando o valor false no atributo filtro
 	 * */
 	void filtroPortaOrigem(int portaOrigemIni, int portaOrigemFin) {
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
 			if (portaOrigemFin == -1) {
-				if ((*it)->getOrigemPorta() != portaOrigemIni) {
-					(*it)->setFiltro(false);
+				if (current->getElement()->getOrigemPorta() != portaOrigemIni) {
+					current->getElement()->setFiltro(false);
 				}
 			} else {
-				if ((*it)->getOrigemPorta() < portaOrigemIni || (*it)->getOrigemPorta() > portaOrigemFin) {
-					(*it)->setFiltro(false);
+				if (current->getElement()->getOrigemPorta() < portaOrigemIni ||
+					current->getElement()->getOrigemPorta() > portaOrigemFin) {
+					current->getElement()->setFiltro(false);
 				}
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -645,17 +994,20 @@ public:
 	 * Aplicando o valor false no atributo filtro
 	 * */
 	void filtroPortaDestino(int portaDestinoIni, int portaDestinoFin) {
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
 			if (portaDestinoFin == -1) {
-				if ((*it)->getDestinoPorta() != portaDestinoIni) {
-					(*it)->setFiltro(false);
+				if (current->getElement()->getDestinoPorta() != portaDestinoIni) {
+					current->getElement()->setFiltro(false);
 				}
 			} else {
-				if ((*it)->getDestinoPorta() < portaDestinoIni || (*it)->getDestinoPorta() > portaDestinoFin) {
-					(*it)->setFiltro(false);
+				if (current->getElement()->getDestinoPorta() < portaDestinoIni ||
+					current->getElement()->getDestinoPorta() > portaDestinoFin) {
+					current->getElement()->setFiltro(false);
 				}
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -666,11 +1018,13 @@ public:
 	 * */
 	void filtroProtocolo(string protocolo) {
 		protocolo = this->toUpper(protocolo);
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-			if (this->toUpper((*it)->getProtocolo()) != protocolo) {
-				(*it)->setFiltro(false);
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
+			if (this->toUpper(current->getElement()->getProtocolo()) != protocolo) {
+				current->getElement()->setFiltro(false);
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -680,11 +1034,13 @@ public:
 	 * */
 	void filtroOrigemIP(string origemIP) {
 		origemIP = this->toUpper(origemIP);
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-			if (this->toUpper((*it)->getOrigemIP()) != origemIP) {
-				(*it)->setFiltro(false);
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
+			if (this->toUpper(current->getElement()->getOrigemIP()) != origemIP) {
+				current->getElement()->setFiltro(false);
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -694,11 +1050,13 @@ public:
 	 * */
 	void filtroDestinoIP(string destinoIP) {
 		destinoIP = this->toUpper(destinoIP);
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-			if (this->toUpper((*it)->getDestinoIP()) != destinoIP) {
-				(*it)->setFiltro(false);
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = logsValidos->getHead();
+		while (current != NULL) {
+			if (this->toUpper(current->getElement()->getDestinoIP()) != destinoIP) {
+				current->getElement()->setFiltro(false);
 			}
+			current = current->getNext();
 		}
 	}
 
@@ -952,26 +1310,22 @@ public:
 	 * que foram usados e a quantidade total de registros que se encaixam nos filtros
 	 * */
 	void visualizarDados() {
-		vector<Registro *> logsValidos = this->getLogsValidos();
-		cout
-				<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta"
-				<< endl;
-		for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-			cout << (*it)->toString() << endl;
-		}
+		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
+		logsValidos->printlist();
 		cout << endl;
 		cout << "Filtros:" << endl;
 		this->visualizarFiltros();
 		cout << endl;
-		cout << "Total de registros selecionados: " << logsValidos.size() << endl;
+		cout << "Total de registros selecionados: " << logsValidos->size() << endl;
 	}
 
 	/**
 	 * Metodo responsavel por limpar os filtros passando para o valor inicial e setando o atributo filtro como true
 	 * */
 	void limpaFiltros() {
-		for (vector<Registro *>::iterator it = this->logs.begin(); it != this->logs.end(); ++it) {
-			(*it)->setFiltro(true);
+		Node<Registro *> *current = this->logs->getHead();
+		while (current != NULL) {
+			current->getElement()->setFiltro(true);
 		}
 
 		this->dataInicial = "";
@@ -996,6 +1350,13 @@ public:
 	 * Metodo responsavel por realizar a exportacao dos registros que estao com o atributo filtro igual a true.
 	 * */
 	void exportar() {
+		if (this->ordenados->isEmpty()) {
+			cout << "Lista nao ordenada. Necessario ordenar primeiro. Selecione abaixo um algoritmo de ordenacao. " << endl;
+			this->ordenarDadosFiltrados();
+			cout << "Agora pode ser feita a exportacao de dados." << endl;
+			cout << endl;
+		}
+
 		string nomeArquivo;
 		fstream arquivo;
 		cout << "Insira o nome do arquivo onde deseja salvar os registros filtrados: ";
@@ -1004,40 +1365,113 @@ public:
 
 		arquivo.open(nomeArquivo.c_str(), fstream::out);
 
-		vector<Registro *> logsValidos = this->getLogsValidos();
+		Node<Registro *> *current = this->ordenados->getHead();
 
 		if (arquivo.is_open()) {
 			cout << "Exportando..." << endl;
 			arquivo
 					<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta";
-			for (vector<Registro *>::iterator it = logsValidos.begin(); it != logsValidos.end(); ++it) {
-				arquivo << (*it)->getDataHora()->toISO() << "\t";
-				arquivo << (*it)->getCodigo() << "\t";
-				arquivo << (*it)->getMensagem() << "\t";
-				arquivo << (*it)->getClassificacao() << "\t";
-				if ((*it)->getPrioridade() != NULL) {
-					arquivo << (*it)->getPrioridade() << "\t";
+			arquivo << endl;
+			while (current != NULL) {
+				arquivo << current->getElement()->getDataHora()->toISO() << "\t";
+				arquivo << current->getElement()->getCodigo() << "\t";
+				arquivo << current->getElement()->getMensagem() << "\t";
+				arquivo << current->getElement()->getClassificacao() << "\t";
+				if (current->getElement()->getPrioridade() != NULL) {
+					arquivo << current->getElement()->getPrioridade() << "\t";
 				} else {
 					arquivo << "\t";
 				}
-				arquivo << (*it)->getProtocolo() << "\t";
-				arquivo << (*it)->getOrigemIP() << "\t";
-				if ((*it)->getOrigemPorta() != NULL) {
-					arquivo << (*it)->getOrigemPorta() << "\t";
+				arquivo << current->getElement()->getProtocolo() << "\t";
+				arquivo << current->getElement()->getOrigemIP() << "\t";
+				if (current->getElement()->getOrigemPorta() != NULL) {
+					arquivo << current->getElement()->getOrigemPorta() << "\t";
 				} else {
 					arquivo << "\t";
 				}
-				arquivo << (*it)->getDestinoIP() << "\t";
-				if ((*it)->getDestinoPorta() != NULL) {
-					arquivo << (*it)->getDestinoPorta() << "\t";
+				arquivo << current->getElement()->getDestinoIP() << "\t";
+				if (current->getElement()->getDestinoPorta() != NULL) {
+					arquivo << current->getElement()->getDestinoPorta() << "\t";
 				} else {
 					arquivo << "\t";
 				}
 				arquivo << endl;
+				current = current->getNext();
 			}
 			arquivo.close();
 		}
 		cout << "Exportacao finalizada com sucesso." << endl;
+	}
+
+	void pesquisaBinaria() {
+		if (this->ordenados->isEmpty()) {
+			cout << "Lista nao ordenada. Necessario ordenar primeiro. Selecione abaixo um algoritmo de ordenacao. " << endl;
+			this->ordenarDadosFiltrados();
+			cout << "Agora pode ser feita a pesquisa binaria. " << endl;
+			cout << endl;
+		}
+		string filtro;
+		cout << "Informe um filtro: " << endl;
+		cin >> filtro;
+		Node<Registro *> *node = NULL;
+		for (int i = 1; i <= 10; i++) {
+			node = this->ordenados->binarySearch(i);
+			if (node != NULL) {
+				break;
+			}
+		}
+		if (node != NULL) {
+			cout << node->getElement()->toString() << endl;
+		} else {
+			cout << "Nenhum registro encontrado" << endl;
+		}
+	}
+
+	void ordenarDadosFiltrados() {
+		this->ordenados = this->getLogsValidos();
+		int tipoOrder, atributo;
+		cout << "1 - Metodo simples   - InsertionSort" << endl;
+		cout << "2 - Metodo eficiente - QuickSort" << endl;
+		cin >> tipoOrder;
+		switch (tipoOrder) {
+			case 1:
+				do {
+					cout << " 1 - Ordernar por dataHora" << endl;
+					cout << " 2 - Ordernar por codigo" << endl;
+					cout << " 3 - Ordernar por mensagem" << endl;
+					cout << " 4 - Ordernar por classificacao" << endl;
+					cout << " 5 - Ordernar por prioridade" << endl;
+					cout << " 6 - Ordernar por protocolo" << endl;
+					cout << " 7 - Ordernar por origemIP" << endl;
+					cout << " 8 - Ordernar por origemPorta" << endl;
+					cout << " 9 - Ordernar por destinoIP" << endl;
+					cout << "10 - Ordernar por destinoPorta" << endl;
+					cin >> atributo;
+				} while (atributo < 1 || atributo > 10);
+				this->ordenados->insertionSort(atributo);
+				this->ordenados->printlist();
+				break;
+			case 2:
+				do {
+					cout << " 1 - Ordernar por dataHora" << endl;
+					cout << " 2 - Ordernar por codigo" << endl;
+					cout << " 3 - Ordernar por mensagem" << endl;
+					cout << " 4 - Ordernar por classificacao" << endl;
+					cout << " 5 - Ordernar por prioridade" << endl;
+					cout << " 6 - Ordernar por protocolo" << endl;
+					cout << " 7 - Ordernar por origemIP" << endl;
+					cout << " 8 - Ordernar por origemPorta" << endl;
+					cout << " 9 - Ordernar por destinoIP" << endl;
+					cout << "10 - Ordernar por destinoPorta" << endl;
+					cin >> atributo;
+				} while (atributo < 1 || atributo > 10);
+//				this->ordenados->quickSort(atributo);
+				this->ordenados->printlist();
+				break;
+			default:
+				cout << "Opcao invalida" << endl;
+				break;
+		}
 	}
 
 	~Sistema() {};
@@ -1046,7 +1480,9 @@ public:
 
 int main() {
 	int opc;
-	Sistema *sistema = new Sistema("snortsyslog");
+//	Sistema *sistema = new Sistema("snortsyslog-completo");
+//	Sistema *sistema = new Sistema("snortsyslog");
+	Sistema *sistema = new Sistema("snortsyslog-2");
 
 	do {
 		system("cls");
@@ -1054,8 +1490,10 @@ int main() {
 		cout << "2 - Limpar filtros" << endl;
 		cout << "3 - Visualizar filtros" << endl;
 		cout << "4 - Visualizar dados" << endl;
-		cout << "5 - Exportar dados" << endl;
-		cout << "6 - Sair" << endl;
+		cout << "5 - Ordenar dados filtrados" << endl;
+		cout << "6 - Pesquisa binaria" << endl;
+		cout << "7 - Exportar dados" << endl;
+		cout << "8 - Sair" << endl;
 		cin >> opc;
 
 		switch (opc) {
@@ -1076,10 +1514,18 @@ int main() {
 				system("pause");
 				break;
 			case 5:
-				sistema->exportar();
+				sistema->ordenarDadosFiltrados();
 				system("pause");
 				break;
 			case 6:
+				sistema->pesquisaBinaria();
+				system("pause");
+				break;
+			case 7:
+				sistema->exportar();
+				system("pause");
+				break;
+			case 8:
 				cout << "Saindo..." << endl;
 				break;
 			default:
@@ -1088,7 +1534,7 @@ int main() {
 				break;
 
 		}
-	} while (opc != 6);
+	} while (opc != 8);
 
 	return 0;
 }
