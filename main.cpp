@@ -824,6 +824,7 @@ public:
 
 class Sistema {
 	LinkedList<Registro *> *logs;
+	LinkedList<Registro *> *ordenados;
 	string dataInicial = "", dataFinal = "", horaInicial = "", horaFinal = "", codigo = "", mensagem = "", classificacao = "", protocolo = "", origemIP = "", destinoIP = "";
 	int prioridadeIni = -1, prioridadeFin = -1, portaOrigemIni = -1, portaOrigemFin = -1, portaDestinoIni = -1, portaDestinoFin = -1;
 public:
@@ -832,6 +833,7 @@ public:
 		string line;
 		arq.open(nomeArquivo.c_str(), fstream::in);
 		logs = new LinkedList<Registro *>();
+		ordenados = new LinkedList<Registro *>();
 		if (arq.is_open()) {
 			while (!arq.eof()) {
 				getline(arq, line, '\n');
@@ -1379,6 +1381,13 @@ public:
 	 * Metodo responsavel por realizar a exportacao dos registros que estao com o atributo filtro igual a true.
 	 * */
 	void exportar() {
+		if (this->ordenados->isEmpty()) {
+			cout << "Lista nao ordenada. Necessario ordenar primeiro. Selecione abaixo um algoritmo de ordenacao. " << endl;
+			this->ordenarDadosFiltrados();
+			cout << "Agora pode ser feita a exportacao de dados." << endl;
+			cout << endl;
+		}
+
 		string nomeArquivo;
 		fstream arquivo;
 		cout << "Insira o nome do arquivo onde deseja salvar os registros filtrados: ";
@@ -1387,13 +1396,13 @@ public:
 
 		arquivo.open(nomeArquivo.c_str(), fstream::out);
 
-		LinkedList<Registro *> *logsValidos = this->getLogsValidos();
-		Node<Registro *> *current = logsValidos->getHead();
+		Node<Registro *> *current = this->ordenados->getHead();
 
 		if (arquivo.is_open()) {
 			cout << "Exportando..." << endl;
 			arquivo
 					<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta";
+			arquivo << endl;
 			while (current != NULL) {
 				arquivo << current->getElement()->getDataHora()->toISO() << "\t";
 				arquivo << current->getElement()->getCodigo() << "\t";
@@ -1425,19 +1434,32 @@ public:
 		cout << "Exportacao finalizada com sucesso." << endl;
 	}
 
-	void pesquisaBinaria(int prioridade) {
-		LinkedList<Registro *> *logsFiltrados = this->getLogsValidos();
-		logsFiltrados->insertionSort("");
-		Node<Registro *> *node = logsFiltrados->binarySearch(prioridade);
+	void pesquisaBinaria() {
+		if (this->ordenados->isEmpty()) {
+			cout << "Lista nao ordenada. Necessario ordenar primeiro. Selecione abaixo um algoritmo de ordenacao. " << endl;
+			this->ordenarDadosFiltrados();
+			cout << "Agora pode ser feita a pesquisa binaria. " << endl;
+			cout << endl;
+		}
+		string filtro;
+		cout << "Informe um filtro: " << endl;
+		cin >> filtro;
+		Node<Registro *> *node = NULL;
+		for (int i = 1; i <= 10; i++) {
+			node = this->ordenados->binarySearch(i);
+			if (node != NULL) {
+				break;
+			}
+		}
 		if (node != NULL) {
 			cout << node->getElement()->toString() << endl;
 		} else {
-			cout << "nao encontrado";
+			cout << "Nenhum registro encontrado" << endl;
 		}
 	}
 
 	void ordenarDadosFiltrados() {
-		LinkedList<Registro *> *logsFiltrados = this->getLogsValidos();
+		this->ordenados = this->getLogsValidos();
 		int tipoOrder, atributo;
 		cout << "1 - Metodo simples" << endl;
 		cout << "2 - Metodo eficiente" << endl;
@@ -1457,8 +1479,8 @@ public:
 					cout << "10 - Ordernar por destinoPorta" << endl;
 					cin >> atributo;
 				} while (atributo < 1 || atributo > 10);
-				logsFiltrados->insertionSort(atributo);
-				logsFiltrados->printlist();
+				this->ordenados->insertionSort(atributo);
+				this->ordenados->printlist();
 				break;
 			case 2:
 				do {
@@ -1474,8 +1496,8 @@ public:
 					cout << "10 - Ordernar por destinoPorta" << endl;
 					cin >> atributo;
 				} while (atributo < 1 || atributo > 10);
-//				logsFiltrados->quickSort(atributo);
-				logsFiltrados->printlist();
+//				this->ordenados->quickSort(atributo);
+				this->ordenados->printlist();
 				break;
 			default:
 				cout << "Opcao invalida" << endl;
@@ -1489,7 +1511,9 @@ public:
 
 int main() {
 	int opc;
+//	Sistema *sistema = new Sistema("snortsyslog-completo");
 	Sistema *sistema = new Sistema("snortsyslog");
+//	Sistema *sistema = new Sistema("snortsyslog-2");
 
 	do {
 		system("cls");
@@ -1525,7 +1549,7 @@ int main() {
 				system("pause");
 				break;
 			case 6:
-				sistema->pesquisaBinaria(2);
+				sistema->pesquisaBinaria();
 				system("pause");
 				break;
 			case 7:
