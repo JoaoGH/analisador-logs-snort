@@ -444,6 +444,7 @@ public:
 	/**
 	 * Metodo responsavel por transformar o Registro em uma string para ser exibida na tela.
 	 * O metodo ainda deixa a mensagem com um tamanho maximo de 30 caracteres
+	 * e seta um tamanho fixo para a coluna ser exibida
 	 * */
 	string toString() {
 		string content = "";
@@ -451,24 +452,70 @@ public:
 		content += dataHora->toISO();
 		content += "\t";
 		content += codigo;
+		if (codigo.length() < 10) {
+			for (int i = 0; i < (10 - codigo.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
-		content += this->mensagem.substr(0, 30);;
+		content += this->mensagem.substr(0, 30);
+		if (mensagem.length() < 30) {
+			for (int i = 0; i < (30 - mensagem.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += classificacao;
+		if (classificacao.length() < 30) {
+			for (int i = 0; i < (30 - classificacao.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += to_string(prioridade); // int
+		if (to_string(prioridade).length() < 10) {
+			for (int i = 0; i < (10 - to_string(prioridade).length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += protocolo;
+		if (protocolo.length() < 10) {
+			for (int i = 0; i < (10 - protocolo.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += origemIP;
+		if (origemIP.length() < 20) {
+			for (int i = 0; i < (20 - origemIP.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += to_string(origemPorta); // int
+		if (to_string(origemPorta).length() < 20) {
+			for (int i = 0; i < (20 - to_string(origemPorta).length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += destinoIP;
+		if (destinoIP.length() < 20) {
+			for (int i = 0; i < (20 - destinoIP.length()); i++) {
+				content += " ";
+			}
+		}
 		content += "\t";
 		content += to_string(destinoPorta); // int
+		if (to_string(destinoPorta).length() < 20) {
+			for (int i = 0; i < (20 - to_string(destinoPorta).length()); i++) {
+				content += " ";
+			}
+		}
 
 		return content;
+
 	}
 
 };
@@ -705,7 +752,16 @@ public:
 	void printlist() {
 		Node<Registro *> *current = head;
 		cout
-				<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta"
+				<< "DataHora         \t" // 20
+				<< "Codigo    \t"//10
+	   			<< "Mensagem                      \t" //30
+		  		<< "Classificacao                 \t"
+		 		<< "Prioridade\t"
+				<< "Protocolo \t"
+	   			<< "OrigemIP            \t"
+		  		<< "OrigemPorta         \t"
+		 		<< "DestinoIP           \t"
+				<< "DestinoPorta"
 				<< endl;
 		while (current != NULL) {
 			cout << current->getElement()->toString() << endl;
@@ -1425,8 +1481,8 @@ public:
 int main() {
 	int opc;
 //	Sistema *sistema = new Sistema("snortsyslog-completo");
-	Sistema *sistema = new Sistema("snortsyslog");
-//	Sistema *sistema = new Sistema("snortsyslog-2");
+//	Sistema *sistema = new Sistema("snortsyslog");
+	Sistema *sistema = new Sistema("snortsyslog-2");
 
 	do {
 		system("cls");
