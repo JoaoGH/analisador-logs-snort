@@ -558,38 +558,25 @@ public:
 	}
 
 	void insertionSort(int atributo) {
-		// Initialize sorted linked list
 		sorted = NULL;
 		Node<T> *current = this->getHead();
-		// Traverse the given linked list and insert every
-		// node to sorted
 		while (current != NULL) {
-			// Store next for next iteration
 			Node<T> *next = current->getNext();
-			// insert current in sorted linked list
 			sortedInsert(current, atributo);
-			// Update current
 			current = next;
 		}
-		// Update head_ref to point to sorted linked list
 		head = sorted;
 	}
 
 	void sortedInsert(Node<T> *newNode, int atributo) {
-		/* Special case for the head end */
-//		if (sorted == NULL || sorted->getElement()->getPrioridade() > newNode->getElement()->getPrioridade()) {
 		if (sorted == NULL || this->testAtribute(atributo, ">", sorted->getElement(), newNode->getElement())) {
 			newNode->setNext(sorted);
 			sorted = newNode;
 		}
 		else {
 			Node<T> *current = sorted;
-			/* Locate the node before the point of insertion */
-//			while (current->getNext() != NULL && current->getNext()->getElement()->getPrioridade() <= newNode->getElement()->getPrioridade()) {
 			while (current->getNext() != NULL && this->testAtribute(atributo, "<=", current->getNext()->getElement(), newNode->getElement())) {
-//				if (current->getNext()->getElement()->getPrioridade() == newNode->getElement()->getPrioridade()) {
 				if (this->testAtribute(atributo, "==", current->getNext()->getElement(), newNode->getElement())) {
-//					if (current->getNext()->getElement()->getDataHora()->getTimeT() > newNode->getElement()->getDataHora()->getTimeT()) {
 					if (this->testAtribute(atributo, ">", current->getNext()->getElement(), newNode->getElement())) {
 						break;
 					}
