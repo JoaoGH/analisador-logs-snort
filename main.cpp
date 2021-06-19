@@ -732,19 +732,83 @@ public:
 		return atual;
 	}
 
-	Node<T> *binarySearch(int value) {
+	Node<T> *binarySearch(int atributo, string value) {
 		struct Node<T> *start = this->head;
 		struct Node<T> *last = NULL;
 		do {
 			Node<T> *mid = getMidNode(start, last);
-			if (mid == NULL)
+			if (mid == NULL) {
 				return NULL;
-			if (mid->getElement()->getPrioridade() == value)
-				return mid;
-			else if (mid->getElement()->getPrioridade() < value)
-				start = mid->getNext();
-			else
-				last = mid;
+			}
+			int atributoIntMid = NULL;
+			string atributoString = "";
+			int tam = NULL;
+			switch(atributo) {
+				case 1:
+					// DataHora
+					atributoIntMid = mid->getElement()->getDataHora()->getTimeT();
+					break;
+				case 2:
+					// Codigo
+					tam = mid->getElement()->getCodigo().size() < value.size() ? mid->getElement()->getCodigo().size() : value.size();
+					atributoString = mid->getElement()->getCodigo();
+					break;
+				case 3:
+					// Mensagem
+					tam = mid->getElement()->getMensagem().size() < value.size() ? mid->getElement()->getMensagem().size() : value.size();
+					atributoString = mid->getElement()->getMensagem();
+					break;
+				case 4:
+					// Classificacao
+					tam = mid->getElement()->getClassificacao().size() < value.size() ? mid->getElement()->getClassificacao().size() : value.size();
+					atributoString = mid->getElement()->getClassificacao();
+					break;
+				case 5:
+					// Prioridade
+					atributoIntMid = mid->getElement()->getPrioridade();
+					break;
+				case 6:
+					// Protocolo
+					tam = mid->getElement()->getProtocolo().size() < value.size() ? mid->getElement()->getProtocolo().size() : value.size();
+					atributoString = mid->getElement()->getProtocolo();
+					break;
+				case 7:
+					// OrigemIP
+					tam = mid->getElement()->getOrigemIP().size() < value.size() ? mid->getElement()->getOrigemIP().size() : value.size();
+					atributoString = mid->getElement()->getOrigemIP();
+					break;
+				case 8:
+					// OrigemPorta
+					atributoIntMid = mid->getElement()->getOrigemPorta();
+					break;
+				case 9:
+					// DestinoIP
+					tam = mid->getElement()->getDestinoIP().size() < value.size() ? mid->getElement()->getDestinoIP().size() : value.size();
+					atributoString = mid->getElement()->getDestinoIP();
+					break;
+				case 10:
+					// DestinoPorta
+					atributoIntMid = mid->getElement()->getDestinoPorta();
+					break;
+			}
+			if (atributoString != "") {
+				mid = NULL;
+//				if (this->stringToIntValue(atributoString, tam) == this->stringToIntValue(value, tam)) {
+//					return mid;
+//				} else if (this->stringToIntValue(atributoString, tam) < this->stringToIntValue(value, tam)) {
+//					start = mid->getNext();
+//				} else {
+//					last = mid;
+//				}
+			} else {
+				if (atributoIntMid == atoi(value.c_str())) {
+					return mid;
+				} else if (atributoIntMid < atoi(value.c_str())) {
+					start = mid->getNext();
+				} else {
+					last = mid;
+				}
+			}
 		} while (last == NULL || last != start);
 		return NULL;
 	}
@@ -1415,7 +1479,7 @@ public:
 		cin >> filtro;
 		Node<Registro *> *node = NULL;
 		for (int i = 1; i <= 10; i++) {
-			node = this->ordenados->binarySearch(i);
+			node = this->ordenados->binarySearch(i, filtro);
 			if (node != NULL) {
 				break;
 			}
