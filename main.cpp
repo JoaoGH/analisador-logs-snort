@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <time.h>
+#include <string.h>
 #include <iomanip>
 
 using namespace std;
@@ -643,7 +644,8 @@ public:
 	 * Certamente tem um jeito mais facil de fazer isso, mas eu nao sei... ainda.
 	 * */
 	bool testAtribute(int atributo, string testType, T element1, T element2) {
-		int tam, valor1, valor2;
+		int valor1, valor2;
+		string valor1Str, valor2Str;
 		switch (atributo) {
 			case 1:
 				// DataHora
@@ -652,21 +654,18 @@ public:
 				break;
 			case 2:
 				// Codigo
-				tam = element1->getCodigo().size() < element2->getCodigo().size() ? element1->getCodigo().size() : element2->getCodigo().size();
-				valor1 = this->stringToIntValue(element1->getCodigo(), tam);
-				valor2 = this->stringToIntValue(element2->getCodigo(), tam);
+				valor1Str = element1->getCodigo();
+				valor2Str = element2->getCodigo();
 				break;
 			case 3:
 				// Mensagem
-				tam = element1->getMensagem().size() < element2->getMensagem().size() ? element1->getMensagem().size() : element2->getMensagem().size();
-				valor1 = this->stringToIntValue(element1->getMensagem(), tam);
-				valor2 = this->stringToIntValue(element2->getMensagem(), tam);
+				valor1Str = element1->getMensagem();
+				valor2Str = element2->getMensagem();
 				break;
 			case 4:
 				// Classificacao
-				tam = element1->getClassificacao().size() < element2->getClassificacao().size() ? element1->getClassificacao().size() : element2->getClassificacao().size();
-				valor1 = this->stringToIntValue(element1->getClassificacao(), tam);
-				valor2 = this->stringToIntValue(element2->getClassificacao(), tam);
+				valor1Str = element1->getClassificacao();
+				valor2Str = element2->getClassificacao();
 				break;
 			case 5:
 				// Prioridade
@@ -675,15 +674,13 @@ public:
 				break;
 			case 6:
 				// Protocolo
-				tam = element1->getProtocolo().size() < element2->getProtocolo().size() ? element1->getProtocolo().size() : element2->getProtocolo().size();
-				valor1 = this->stringToIntValue(element1->getProtocolo(), tam);
-				valor2 = this->stringToIntValue(element2->getProtocolo(), tam);
+				valor1Str = element1->getProtocolo();
+				valor2Str = element2->getProtocolo();
 				break;
 			case 7:
 				// OrigemIP
-				tam = element1->getOrigemIP().size() < element2->getOrigemIP().size() ? element1->getOrigemIP().size() : element2->getOrigemIP().size();
-				valor1 = this->stringToIntValue(element1->getOrigemIP(), tam);
-				valor2 = this->stringToIntValue(element2->getOrigemIP(), tam);
+				valor1Str = element1->getOrigemIP();
+				valor2Str = element2->getOrigemIP();
 				break;
 			case 8:
 				// OrigemPorta
@@ -692,9 +689,8 @@ public:
 				break;
 			case 9:
 				// DestinoIP
-				tam = element1->getDestinoIP().size() < element2->getDestinoIP().size() ? element1->getDestinoIP().size() : element2->getDestinoIP().size();
-				valor1 = this->stringToIntValue(element1->getDestinoIP(), tam);
-				valor2 = this->stringToIntValue(element2->getDestinoIP(), tam);
+				valor1Str = element1->getDestinoIP();
+				valor2Str = element2->getDestinoIP();
 				break;
 			case 10:
 				// DestinoPorta
@@ -703,16 +699,54 @@ public:
 				break;
 		}
 
-		if (testType == ">") {
-			return valor1 > valor2;
-		} else if (testType == "<") {
-			return valor1 < valor2;
-		} else if (testType == "==") {
-			return valor1 == valor2;
-		} else if (testType == ">=") {
-			return valor1 >= valor2;
-		} else if (testType == "<=") {
-			return valor1 <= valor2;
+		if (valor1Str != "") {
+			// se valor1Str < valor2Str = -1
+			// se valor1Str > valor2Str = 1
+			// se valor1Str == valor2Str = 0
+			int retorno = strcmpi(valor1Str.c_str(), valor2Str.c_str());
+			if (testType == ">") {
+				if (retorno == 1) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (testType == "<") {
+				if (retorno == -1) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (testType == "==") {
+				if (retorno == 0) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (testType == ">=") {
+				if (retorno == 1 || retorno == 0) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (testType == "<=") {
+				if (retorno == -1 || retorno == 0) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} else {
+			if (testType == ">") {
+				return valor1 > valor2;
+			} else if (testType == "<") {
+				return valor1 < valor2;
+			} else if (testType == "==") {
+				return valor1 == valor2;
+			} else if (testType == ">=") {
+				return valor1 >= valor2;
+			} else if (testType == "<=") {
+				return valor1 <= valor2;
+			}
 		}
 	}
 
@@ -792,14 +826,14 @@ public:
 					break;
 			}
 			if (atributoString != "") {
-				mid = NULL;
-//				if (this->stringToIntValue(atributoString, tam) == this->stringToIntValue(value, tam)) {
-//					return mid;
-//				} else if (this->stringToIntValue(atributoString, tam) < this->stringToIntValue(value, tam)) {
-//					start = mid->getNext();
-//				} else {
-//					last = mid;
-//				}
+				// nao eh 100% precisa. funciona bem com IPs
+				if (strcmpi(atributoString.c_str(), value.c_str()) == 0) {
+					return mid;
+				} else if (strcmpi(atributoString.c_str(), value.c_str()) == -1) {
+					start = mid->getNext();
+				} else {
+					last = mid;
+				}
 			} else {
 				if (atributoIntMid == atoi(value.c_str())) {
 					return mid;
@@ -831,26 +865,6 @@ public:
 			cout << current->getElement()->toString() << endl;
 			current = current->getNext();
 		}
-	}
-
-	int stringToIntValue(string s1, int byte) {
-		s1 = this->toUpper(s1);
-		int size = 0;
-		for (int i = 0; i < byte; i++) {
-			size += s1[i];
-		}
-		return size;
-	}
-
-	/**
-	 * Necessario replicar para testes de filtro de strings
-	 * */
-	string toUpper(string param) {
-		string up = "";
-		for (int i = 0; i < param.size(); i++) {
-			up += toupper(param[i]);
-		}
-		return up;
 	}
 
 };
