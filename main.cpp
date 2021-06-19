@@ -223,6 +223,17 @@ public:
 		return dt;
 	}
 
+	time_t getTimeT() {
+		string data = this->toISO();
+		struct tm date = {};
+		stringstream issData(data);
+		time_t dt = NULL;
+		if (issData >> get_time(&date, "%Y-%m-%dT%H:%M:%S")) {
+			dt = mktime(&date);
+		}
+		return dt;
+	}
+
 };
 
 class Registro {
@@ -546,33 +557,206 @@ public:
 		return this->tail;
 	}
 
-	void insertionSort(string atributo) {
+	void insertionSort(int atributo) {
+		// Initialize sorted linked list
 		sorted = NULL;
-		Node<T> *current = head;
+		Node<T> *current = this->getHead();
+		// Traverse the given linked list and insert every
+		// node to sorted
 		while (current != NULL) {
+			// Store next for next iteration
 			Node<T> *next = current->getNext();
-			sortedInsert(current);
+			// insert current in sorted linked list
+			sortedInsert(current, atributo);
+			// Update current
 			current = next;
 		}
+		// Update head_ref to point to sorted linked list
 		head = sorted;
 	}
 
-	void sortedInsert(Node<T> *newNode) {
-		if (sorted == NULL || sorted->getElement()->getPrioridade() > newNode->getElement()->getPrioridade()) {
+	void sortedInsert(Node<T> *newNode, int atributo) {
+		/* Special case for the head end */
+//		if (sorted == NULL || sorted->getElement()->getPrioridade() > newNode->getElement()->getPrioridade()) {
+		if (sorted == NULL || this->testAtribute(atributo, ">", sorted->getElement(), newNode->getElement())) {
 			newNode->setNext(sorted);
 			sorted = newNode;
-		} else {
+		}
+		else {
 			Node<T> *current = sorted;
-			while (current->getNext() != NULL && current->getNext()->getElement()->getPrioridade() <= newNode->getElement()->getPrioridade()) {
+			/* Locate the node before the point of insertion */
+//			while (current->getNext() != NULL && current->getNext()->getElement()->getPrioridade() <= newNode->getElement()->getPrioridade()) {
+			while (current->getNext() != NULL && this->testAtribute(atributo, "<=", current->getNext()->getElement(), newNode->getElement())) {
+//				if (current->getNext()->getElement()->getPrioridade() == newNode->getElement()->getPrioridade()) {
+				if (this->testAtribute(atributo, "==", current->getNext()->getElement(), newNode->getElement())) {
+//					if (current->getNext()->getElement()->getDataHora()->getTimeT() > newNode->getElement()->getDataHora()->getTimeT()) {
+					if (this->testAtribute(atributo, ">", current->getNext()->getElement(), newNode->getElement())) {
+						break;
+					}
+				}
 				current = current->getNext();
 			}
 			newNode->setNext(current->getNext());
 			current->setNext(newNode);
-			newNode->setPrevious(current);
 		}
 	}
 
-	Node<T> * getMidNode(Node<T> *start, Node<T> *last) {
+	/**
+	 * Certamente tem um jeito mais facil de fazer isso, mas eu nao sei... ainda.
+	 * */
+	bool testAtribute(int atributo, string testType, T element1, T element2) {
+		int tam;
+		switch (atributo) {
+			case 1:
+				// DataHora
+				if (testType == ">") {
+					return element1->getDataHora()->getTimeT() > element2->getDataHora()->getTimeT();
+				} else if (testType == "<") {
+					return element1->getDataHora()->getTimeT() < element2->getDataHora()->getTimeT();
+				} else if (testType == "==") {
+					return element1->getDataHora()->getTimeT() == element2->getDataHora()->getTimeT();
+				} else if (testType == ">=") {
+					return element1->getDataHora()->getTimeT() >= element2->getDataHora()->getTimeT();
+				} else if (testType == "<=") {
+					return element1->getDataHora()->getTimeT() <= element2->getDataHora()->getTimeT();
+				}
+				break;
+			case 2:
+				// Codigo
+				tam = element1->getCodigo().size() < element2->getCodigo().size() ? element1->getCodigo().size() : element2->getCodigo().size();
+				if (testType == ">") {
+					return this->stringToIntValue(element1->getCodigo(), tam) > this->stringToIntValue(element2->getCodigo(), tam);
+				} else if (testType == "<") {
+					return this->stringToIntValue(element1->getCodigo(), tam) < this->stringToIntValue(element2->getCodigo(), tam);
+				} else if (testType == "==") {
+					return this->stringToIntValue(element1->getCodigo(), tam) == this->stringToIntValue(element2->getCodigo(), tam);
+				} else if (testType == ">=") {
+					return this->stringToIntValue(element1->getCodigo(), tam) >= this->stringToIntValue(element2->getCodigo(), tam);
+				} else if (testType == "<=") {
+					return this->stringToIntValue(element1->getCodigo(), tam) <= this->stringToIntValue(element2->getCodigo(), tam);
+				}
+				break;
+			case 3:
+				// Mensagem
+				tam = element1->getMensagem().size() < element2->getMensagem().size() ? element1->getMensagem().size() : element2->getMensagem().size();
+				if (testType == ">") {
+					return this->stringToIntValue(element1->getMensagem(), tam) > this->stringToIntValue(element2->getMensagem(), tam);
+				} else if (testType == "<") {
+					return this->stringToIntValue(element1->getMensagem(), tam) < this->stringToIntValue(element2->getMensagem(), tam);
+				} else if (testType == "==") {
+					return this->stringToIntValue(element1->getMensagem(), tam) == this->stringToIntValue(element2->getMensagem(), tam);
+				} else if (testType == ">=") {
+					return this->stringToIntValue(element1->getMensagem(), tam) >= this->stringToIntValue(element2->getMensagem(), tam);
+				} else if (testType == "<=") {
+					return this->stringToIntValue(element1->getMensagem(), tam) <= this->stringToIntValue(element2->getMensagem(), tam);
+				}
+				break;
+			case 4:
+				// Classificacao
+				tam = element1->getClassificacao().size() < element2->getClassificacao().size() ? element1->getClassificacao().size() : element2->getClassificacao().size();
+				if (testType == ">") {
+					return this->stringToIntValue(element1->getClassificacao(), tam) > this->stringToIntValue(element2->getClassificacao(), tam);
+				} else if (testType == "<") {
+					return this->stringToIntValue(element1->getClassificacao(), tam) < this->stringToIntValue(element2->getClassificacao(), tam);
+				} else if (testType == "==") {
+					return this->stringToIntValue(element1->getClassificacao(), tam) == this->stringToIntValue(element2->getClassificacao(), tam);
+				} else if (testType == ">=") {
+					return this->stringToIntValue(element1->getClassificacao(), tam) >= this->stringToIntValue(element2->getClassificacao(), tam);
+				} else if (testType == "<=") {
+					return this->stringToIntValue(element1->getClassificacao(), tam) <= this->stringToIntValue(element2->getClassificacao(), tam);
+				}
+				break;
+			case 5:
+				// Prioridade
+				if (testType == ">") {
+					return element1->getPrioridade() > element2->getPrioridade();
+				} else if (testType == "<") {
+					return element1->getPrioridade() < element2->getPrioridade();
+				} else if (testType == "==") {
+					return element1->getPrioridade() == element2->getPrioridade();
+				} else if (testType == ">=") {
+					return element1->getPrioridade() >= element2->getPrioridade();
+				} else if (testType == "<=") {
+					return element1->getPrioridade() <= element2->getPrioridade();
+				}
+				break;
+			case 6:
+				// Protocolo
+				tam = element1->getProtocolo().size() < element2->getProtocolo().size() ? element1->getProtocolo().size() : element2->getProtocolo().size();
+				if (testType == ">") {
+					return this->stringToIntValue(element1->getProtocolo(), tam) > this->stringToIntValue(element2->getProtocolo(), tam);
+				} else if (testType == "<") {
+					return this->stringToIntValue(element1->getProtocolo(), tam) < this->stringToIntValue(element2->getProtocolo(), tam);
+				} else if (testType == "==") {
+					return this->stringToIntValue(element1->getProtocolo(), tam) == this->stringToIntValue(element2->getProtocolo(), tam);
+				} else if (testType == ">=") {
+					return this->stringToIntValue(element1->getProtocolo(), tam) >= this->stringToIntValue(element2->getProtocolo(), tam);
+				} else if (testType == "<=") {
+					return this->stringToIntValue(element1->getProtocolo(), tam) <= this->stringToIntValue(element2->getProtocolo(), tam);
+				}
+				break;
+			case 7:
+				// OrigemIP
+				tam = element1->getOrigemIP().size() < element2->getOrigemIP().size() ? element1->getOrigemIP().size() : element2->getOrigemIP().size();
+				if (testType == ">") {
+					return this->stringToIntValue(element1->getOrigemIP(), tam) > this->stringToIntValue(element2->getOrigemIP(), tam);
+				} else if (testType == "<") {
+					return this->stringToIntValue(element1->getOrigemIP(), tam) < this->stringToIntValue(element2->getOrigemIP(), tam);
+				} else if (testType == "==") {
+					return this->stringToIntValue(element1->getOrigemIP(), tam) == this->stringToIntValue(element2->getOrigemIP(), tam);
+				} else if (testType == ">=") {
+					return this->stringToIntValue(element1->getOrigemIP(), tam) >= this->stringToIntValue(element2->getOrigemIP(), tam);
+				} else if (testType == "<=") {
+					return this->stringToIntValue(element1->getOrigemIP(), tam) <= this->stringToIntValue(element2->getOrigemIP(), tam);
+				}
+				break;
+			case 8:
+				// OrigemPorta
+				if (testType == ">") {
+					return element1->getOrigemPorta() > element2->getOrigemPorta();
+				} else if (testType == "<") {
+					return element1->getOrigemPorta() < element2->getOrigemPorta();
+				} else if (testType == "==") {
+					return element1->getOrigemPorta() == element2->getOrigemPorta();
+				} else if (testType == ">=") {
+					return element1->getOrigemPorta() >= element2->getOrigemPorta();
+				} else if (testType == "<=") {
+					return element1->getOrigemPorta() <= element2->getOrigemPorta();
+				}
+				break;
+			case 9:
+				// DestinoIP
+				tam = element1->getDestinoIP().size() < element2->getDestinoIP().size() ? element1->getDestinoIP().size() : element2->getDestinoIP().size();
+				if (testType == ">") {
+					return this->stringToIntValue(element1->getDestinoIP(), tam) > this->stringToIntValue(element2->getDestinoIP(), tam);
+				} else if (testType == "<") {
+					return this->stringToIntValue(element1->getDestinoIP(), tam) < this->stringToIntValue(element2->getDestinoIP(), tam);
+				} else if (testType == "==") {
+					return this->stringToIntValue(element1->getDestinoIP(), tam) == this->stringToIntValue(element2->getDestinoIP(), tam);
+				} else if (testType == ">=") {
+					return this->stringToIntValue(element1->getDestinoIP(), tam) >= this->stringToIntValue(element2->getDestinoIP(), tam);
+				} else if (testType == "<=") {
+					return this->stringToIntValue(element1->getDestinoIP(), tam) <= this->stringToIntValue(element2->getDestinoIP(), tam);
+				}
+				break;
+			case 10:
+				// DestinoPorta
+				if (testType == ">") {
+					return element1->getDestinoPorta() > element2->getDestinoPorta();
+				} else if (testType == "<") {
+					return element1->getDestinoPorta() < element2->getDestinoPorta();
+				} else if (testType == "==") {
+					return element1->getDestinoPorta() == element2->getDestinoPorta();
+				} else if (testType == ">=") {
+					return element1->getDestinoPorta() >= element2->getDestinoPorta();
+				} else if (testType == "<=") {
+					return element1->getDestinoPorta() <= element2->getDestinoPorta();
+				}
+				break;
+		}
+	}
+
+	Node<T> *getMidNode(Node<T> *start, Node<T> *last) {
 		if (start == NULL) {
 			return NULL;
 		}
@@ -588,11 +772,11 @@ public:
 		return atual;
 	}
 
-	Node<T> *binarySearch(int value){
-		struct Node<T>* start = this->head;
-		struct Node<T>* last = NULL;
+	Node<T> *binarySearch(int value) {
+		struct Node<T> *start = this->head;
+		struct Node<T> *last = NULL;
 		do {
-			Node<T>* mid = getMidNode(start, last);
+			Node<T> *mid = getMidNode(start, last);
 			if (mid == NULL)
 				return NULL;
 			if (mid->getElement()->getPrioridade() == value)
@@ -607,11 +791,33 @@ public:
 
 	void printlist() {
 		Node<Registro *> *current = head;
-		cout << "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta" << endl;
+		cout
+				<< "DataHora\tCodigo\tMensagem\tClassificacao\tPrioridade\tProtocolo\tOrigemIP\tOrigemPorta\tDestinoIP\tDestinoPorta"
+				<< endl;
 		while (current != NULL) {
 			cout << current->getElement()->toString() << endl;
 			current = current->getNext();
 		}
+	}
+
+	int stringToIntValue(string s1, int byte) {
+		s1 = this->toUpper(s1);
+		int size = 0;
+		for (int i = 0; i < byte; i++) {
+			size += s1[i];
+		}
+		return size;
+	}
+
+	/**
+	 * Necessario replicar para testes de filtro de strings
+	 * */
+	string toUpper(string param) {
+		string up = "";
+		for (int i = 0; i < param.size(); i++) {
+			up += toupper(param[i]);
+		}
+		return up;
 	}
 
 };
@@ -779,7 +985,8 @@ public:
 					current->getElement()->setFiltro(false);
 				}
 			} else {
-				if (current->getElement()->getPrioridade() < prioridadeIni || current->getElement()->getPrioridade() > prioridadeFin) {
+				if (current->getElement()->getPrioridade() < prioridadeIni ||
+					current->getElement()->getPrioridade() > prioridadeFin) {
 					current->getElement()->setFiltro(false);
 				}
 			}
@@ -801,7 +1008,8 @@ public:
 					current->getElement()->setFiltro(false);
 				}
 			} else {
-				if (current->getElement()->getOrigemPorta() < portaOrigemIni || current->getElement()->getOrigemPorta() > portaOrigemFin) {
+				if (current->getElement()->getOrigemPorta() < portaOrigemIni ||
+					current->getElement()->getOrigemPorta() > portaOrigemFin) {
 					current->getElement()->setFiltro(false);
 				}
 			}
@@ -823,7 +1031,8 @@ public:
 					current->getElement()->setFiltro(false);
 				}
 			} else {
-				if (current->getElement()->getDestinoPorta() < portaDestinoIni || current->getElement()->getDestinoPorta() > portaDestinoFin) {
+				if (current->getElement()->getDestinoPorta() < portaDestinoIni ||
+					current->getElement()->getDestinoPorta() > portaDestinoFin) {
 					current->getElement()->setFiltro(false);
 				}
 			}
@@ -1235,11 +1444,37 @@ public:
 		cin >> tipoOrder;
 		switch (tipoOrder) {
 			case 1:
-				logsFiltrados->insertionSort("");
+				do {
+					cout << " 1 - Ordernar por dataHora" << endl;
+					cout << " 2 - Ordernar por codigo" << endl;
+					cout << " 3 - Ordernar por mensagem" << endl;
+					cout << " 4 - Ordernar por classificacao" << endl;
+					cout << " 5 - Ordernar por prioridade" << endl;
+					cout << " 6 - Ordernar por protocolo" << endl;
+					cout << " 7 - Ordernar por origemIP" << endl;
+					cout << " 8 - Ordernar por origemPorta" << endl;
+					cout << " 9 - Ordernar por destinoIP" << endl;
+					cout << "10 - Ordernar por destinoPorta" << endl;
+					cin >> atributo;
+				} while (atributo < 1 || atributo > 10);
+				logsFiltrados->insertionSort(atributo);
 				logsFiltrados->printlist();
 				break;
 			case 2:
-				logsFiltrados->insertionSort("");
+				do {
+					cout << " 1 - Ordernar por dataHora" << endl;
+					cout << " 2 - Ordernar por codigo" << endl;
+					cout << " 3 - Ordernar por mensagem" << endl;
+					cout << " 4 - Ordernar por classificacao" << endl;
+					cout << " 5 - Ordernar por prioridade" << endl;
+					cout << " 6 - Ordernar por protocolo" << endl;
+					cout << " 7 - Ordernar por origemIP" << endl;
+					cout << " 8 - Ordernar por origemPorta" << endl;
+					cout << " 9 - Ordernar por destinoIP" << endl;
+					cout << "10 - Ordernar por destinoPorta" << endl;
+					cin >> atributo;
+				} while (atributo < 1 || atributo > 10);
+//				logsFiltrados->quickSort(atributo);
 				logsFiltrados->printlist();
 				break;
 			default:
