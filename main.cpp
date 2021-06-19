@@ -602,157 +602,83 @@ public:
 	}
 
 	/**
+	 * Esse metodo e o mais confuso, ele visa comparar 2 elementos para realizar a ordenacao.
+	 * Para o funcionamento dele precisa passar o id do atributo, o tipo de comparacao desejada e os dois elementos,
+	 * com isso o metodo pega o tipo do atributo e a devidada comparcao. No caso de string eh passada prara um valor
+	 * inteiro com base no tamanho da menor string e no caso de DataHora o TimeT que eh comparado.
 	 * Certamente tem um jeito mais facil de fazer isso, mas eu nao sei... ainda.
 	 * */
 	bool testAtribute(int atributo, string testType, T element1, T element2) {
-		int tam;
+		int tam, valor1, valor2;
 		switch (atributo) {
 			case 1:
 				// DataHora
-				if (testType == ">") {
-					return element1->getDataHora()->getTimeT() > element2->getDataHora()->getTimeT();
-				} else if (testType == "<") {
-					return element1->getDataHora()->getTimeT() < element2->getDataHora()->getTimeT();
-				} else if (testType == "==") {
-					return element1->getDataHora()->getTimeT() == element2->getDataHora()->getTimeT();
-				} else if (testType == ">=") {
-					return element1->getDataHora()->getTimeT() >= element2->getDataHora()->getTimeT();
-				} else if (testType == "<=") {
-					return element1->getDataHora()->getTimeT() <= element2->getDataHora()->getTimeT();
-				}
+				valor1 = element1->getDataHora()->getTimeT();
+				valor2 = element2->getDataHora()->getTimeT();
 				break;
 			case 2:
 				// Codigo
 				tam = element1->getCodigo().size() < element2->getCodigo().size() ? element1->getCodigo().size() : element2->getCodigo().size();
-				if (testType == ">") {
-					return this->stringToIntValue(element1->getCodigo(), tam) > this->stringToIntValue(element2->getCodigo(), tam);
-				} else if (testType == "<") {
-					return this->stringToIntValue(element1->getCodigo(), tam) < this->stringToIntValue(element2->getCodigo(), tam);
-				} else if (testType == "==") {
-					return this->stringToIntValue(element1->getCodigo(), tam) == this->stringToIntValue(element2->getCodigo(), tam);
-				} else if (testType == ">=") {
-					return this->stringToIntValue(element1->getCodigo(), tam) >= this->stringToIntValue(element2->getCodigo(), tam);
-				} else if (testType == "<=") {
-					return this->stringToIntValue(element1->getCodigo(), tam) <= this->stringToIntValue(element2->getCodigo(), tam);
-				}
+				valor1 = this->stringToIntValue(element1->getCodigo(), tam);
+				valor2 = this->stringToIntValue(element2->getCodigo(), tam);
 				break;
 			case 3:
 				// Mensagem
 				tam = element1->getMensagem().size() < element2->getMensagem().size() ? element1->getMensagem().size() : element2->getMensagem().size();
-				if (testType == ">") {
-					return this->stringToIntValue(element1->getMensagem(), tam) > this->stringToIntValue(element2->getMensagem(), tam);
-				} else if (testType == "<") {
-					return this->stringToIntValue(element1->getMensagem(), tam) < this->stringToIntValue(element2->getMensagem(), tam);
-				} else if (testType == "==") {
-					return this->stringToIntValue(element1->getMensagem(), tam) == this->stringToIntValue(element2->getMensagem(), tam);
-				} else if (testType == ">=") {
-					return this->stringToIntValue(element1->getMensagem(), tam) >= this->stringToIntValue(element2->getMensagem(), tam);
-				} else if (testType == "<=") {
-					return this->stringToIntValue(element1->getMensagem(), tam) <= this->stringToIntValue(element2->getMensagem(), tam);
-				}
+				valor1 = this->stringToIntValue(element1->getMensagem(), tam);
+				valor2 = this->stringToIntValue(element2->getMensagem(), tam);
 				break;
 			case 4:
 				// Classificacao
 				tam = element1->getClassificacao().size() < element2->getClassificacao().size() ? element1->getClassificacao().size() : element2->getClassificacao().size();
-				if (testType == ">") {
-					return this->stringToIntValue(element1->getClassificacao(), tam) > this->stringToIntValue(element2->getClassificacao(), tam);
-				} else if (testType == "<") {
-					return this->stringToIntValue(element1->getClassificacao(), tam) < this->stringToIntValue(element2->getClassificacao(), tam);
-				} else if (testType == "==") {
-					return this->stringToIntValue(element1->getClassificacao(), tam) == this->stringToIntValue(element2->getClassificacao(), tam);
-				} else if (testType == ">=") {
-					return this->stringToIntValue(element1->getClassificacao(), tam) >= this->stringToIntValue(element2->getClassificacao(), tam);
-				} else if (testType == "<=") {
-					return this->stringToIntValue(element1->getClassificacao(), tam) <= this->stringToIntValue(element2->getClassificacao(), tam);
-				}
+				valor1 = this->stringToIntValue(element1->getClassificacao(), tam);
+				valor2 = this->stringToIntValue(element2->getClassificacao(), tam);
 				break;
 			case 5:
 				// Prioridade
-				if (testType == ">") {
-					return element1->getPrioridade() > element2->getPrioridade();
-				} else if (testType == "<") {
-					return element1->getPrioridade() < element2->getPrioridade();
-				} else if (testType == "==") {
-					return element1->getPrioridade() == element2->getPrioridade();
-				} else if (testType == ">=") {
-					return element1->getPrioridade() >= element2->getPrioridade();
-				} else if (testType == "<=") {
-					return element1->getPrioridade() <= element2->getPrioridade();
-				}
+				valor1 = element1->getPrioridade();
+				valor2 = element2->getPrioridade();
 				break;
 			case 6:
 				// Protocolo
 				tam = element1->getProtocolo().size() < element2->getProtocolo().size() ? element1->getProtocolo().size() : element2->getProtocolo().size();
-				if (testType == ">") {
-					return this->stringToIntValue(element1->getProtocolo(), tam) > this->stringToIntValue(element2->getProtocolo(), tam);
-				} else if (testType == "<") {
-					return this->stringToIntValue(element1->getProtocolo(), tam) < this->stringToIntValue(element2->getProtocolo(), tam);
-				} else if (testType == "==") {
-					return this->stringToIntValue(element1->getProtocolo(), tam) == this->stringToIntValue(element2->getProtocolo(), tam);
-				} else if (testType == ">=") {
-					return this->stringToIntValue(element1->getProtocolo(), tam) >= this->stringToIntValue(element2->getProtocolo(), tam);
-				} else if (testType == "<=") {
-					return this->stringToIntValue(element1->getProtocolo(), tam) <= this->stringToIntValue(element2->getProtocolo(), tam);
-				}
+				valor1 = this->stringToIntValue(element1->getProtocolo(), tam);
+				valor2 = this->stringToIntValue(element2->getProtocolo(), tam);
 				break;
 			case 7:
 				// OrigemIP
 				tam = element1->getOrigemIP().size() < element2->getOrigemIP().size() ? element1->getOrigemIP().size() : element2->getOrigemIP().size();
-				if (testType == ">") {
-					return this->stringToIntValue(element1->getOrigemIP(), tam) > this->stringToIntValue(element2->getOrigemIP(), tam);
-				} else if (testType == "<") {
-					return this->stringToIntValue(element1->getOrigemIP(), tam) < this->stringToIntValue(element2->getOrigemIP(), tam);
-				} else if (testType == "==") {
-					return this->stringToIntValue(element1->getOrigemIP(), tam) == this->stringToIntValue(element2->getOrigemIP(), tam);
-				} else if (testType == ">=") {
-					return this->stringToIntValue(element1->getOrigemIP(), tam) >= this->stringToIntValue(element2->getOrigemIP(), tam);
-				} else if (testType == "<=") {
-					return this->stringToIntValue(element1->getOrigemIP(), tam) <= this->stringToIntValue(element2->getOrigemIP(), tam);
-				}
+				valor1 = this->stringToIntValue(element1->getOrigemIP(), tam);
+				valor2 = this->stringToIntValue(element2->getOrigemIP(), tam);
 				break;
 			case 8:
 				// OrigemPorta
-				if (testType == ">") {
-					return element1->getOrigemPorta() > element2->getOrigemPorta();
-				} else if (testType == "<") {
-					return element1->getOrigemPorta() < element2->getOrigemPorta();
-				} else if (testType == "==") {
-					return element1->getOrigemPorta() == element2->getOrigemPorta();
-				} else if (testType == ">=") {
-					return element1->getOrigemPorta() >= element2->getOrigemPorta();
-				} else if (testType == "<=") {
-					return element1->getOrigemPorta() <= element2->getOrigemPorta();
-				}
+				valor1 = element1->getOrigemPorta();
+				valor2 = element2->getOrigemPorta();
 				break;
 			case 9:
 				// DestinoIP
 				tam = element1->getDestinoIP().size() < element2->getDestinoIP().size() ? element1->getDestinoIP().size() : element2->getDestinoIP().size();
-				if (testType == ">") {
-					return this->stringToIntValue(element1->getDestinoIP(), tam) > this->stringToIntValue(element2->getDestinoIP(), tam);
-				} else if (testType == "<") {
-					return this->stringToIntValue(element1->getDestinoIP(), tam) < this->stringToIntValue(element2->getDestinoIP(), tam);
-				} else if (testType == "==") {
-					return this->stringToIntValue(element1->getDestinoIP(), tam) == this->stringToIntValue(element2->getDestinoIP(), tam);
-				} else if (testType == ">=") {
-					return this->stringToIntValue(element1->getDestinoIP(), tam) >= this->stringToIntValue(element2->getDestinoIP(), tam);
-				} else if (testType == "<=") {
-					return this->stringToIntValue(element1->getDestinoIP(), tam) <= this->stringToIntValue(element2->getDestinoIP(), tam);
-				}
+				valor1 = this->stringToIntValue(element1->getDestinoIP(), tam);
+				valor2 = this->stringToIntValue(element2->getDestinoIP(), tam);
 				break;
 			case 10:
 				// DestinoPorta
-				if (testType == ">") {
-					return element1->getDestinoPorta() > element2->getDestinoPorta();
-				} else if (testType == "<") {
-					return element1->getDestinoPorta() < element2->getDestinoPorta();
-				} else if (testType == "==") {
-					return element1->getDestinoPorta() == element2->getDestinoPorta();
-				} else if (testType == ">=") {
-					return element1->getDestinoPorta() >= element2->getDestinoPorta();
-				} else if (testType == "<=") {
-					return element1->getDestinoPorta() <= element2->getDestinoPorta();
-				}
+				valor1 = element1->getDestinoPorta();
+				valor2 = element2->getDestinoPorta();
 				break;
+		}
+
+		if (testType == ">") {
+			return valor1 > valor2;
+		} else if (testType == "<") {
+			return valor1 < valor2;
+		} else if (testType == "==") {
+			return valor1 == valor2;
+		} else if (testType == ">=") {
+			return valor1 >= valor2;
+		} else if (testType == "<=") {
+			return valor1 <= valor2;
 		}
 	}
 
@@ -1461,8 +1387,8 @@ public:
 	void ordenarDadosFiltrados() {
 		this->ordenados = this->getLogsValidos();
 		int tipoOrder, atributo;
-		cout << "1 - Metodo simples" << endl;
-		cout << "2 - Metodo eficiente" << endl;
+		cout << "1 - Metodo simples   - InsertionSort" << endl;
+		cout << "2 - Metodo eficiente - QuickSort" << endl;
 		cin >> tipoOrder;
 		switch (tipoOrder) {
 			case 1:
