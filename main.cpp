@@ -519,6 +519,10 @@ public:
 
 	}
 
+	~Registro() {
+		delete[] this->dataHora;
+	}
+
 };
 
 
@@ -556,6 +560,12 @@ public:
 
 	void setPrevious(Node *previous) {
 		this->previous = previous;
+	}
+
+	~Node() {
+		delete[] this->element;
+		delete[] this->next;
+		delete[] this->previous;
 	}
 };
 
@@ -620,12 +630,13 @@ public:
 		if (sorted == NULL || this->testAtribute(atributo, ">", sorted->getElement(), newNode->getElement())) {
 			newNode->setNext(sorted);
 			sorted = newNode;
-		}
-		else {
+		} else {
 			Node<T> *current = sorted;
-			while (current->getNext() != NULL && this->testAtribute(atributo, "<=", current->getNext()->getElement(), newNode->getElement())) {
+			while (current->getNext() != NULL &&
+				   this->testAtribute(atributo, "<=", current->getNext()->getElement(), newNode->getElement())) {
 				if (this->testAtribute(atributo, "==", current->getNext()->getElement(), newNode->getElement())) {
-					if (current->getNext()->getElement()->getDataHora()->getTimeT() > newNode->getElement()->getDataHora()->getTimeT()) {
+					if (current->getNext()->getElement()->getDataHora()->getTimeT() >
+						newNode->getElement()->getDataHora()->getTimeT()) {
 						break;
 					}
 				}
@@ -776,7 +787,7 @@ public:
 			}
 			int atributoIntMid = NULL;
 			string atributoString = "";
-			switch(atributo) {
+			switch (atributo) {
 				case 1:
 					// DataHora
 					atributoIntMid = mid->getElement()->getDataHora()->getTimeT();
@@ -844,13 +855,13 @@ public:
 		cout
 				<< "DataHora         \t" // 20
 				<< "Codigo    \t"//10
-	   			<< "Mensagem                      \t" //30
-		  		<< "Classificacao                 \t"
-		 		<< "Prioridade\t"
+				<< "Mensagem                      \t" //30
+				<< "Classificacao                 \t"
+				<< "Prioridade\t"
 				<< "Protocolo \t"
-	   			<< "OrigemIP            \t"
-		  		<< "OrigemPorta         \t"
-		 		<< "DestinoIP           \t"
+				<< "OrigemIP            \t"
+				<< "OrigemPorta         \t"
+				<< "DestinoIP           \t"
 				<< "DestinoPorta"
 				<< endl;
 		while (current != NULL) {
@@ -859,6 +870,11 @@ public:
 		}
 	}
 
+ 	~LinkedList() {
+		delete[] this->head;
+		delete[] this->tail;
+		delete[] this->sorted;
+	}
 };
 
 class Sistema {
@@ -1542,7 +1558,10 @@ public:
 		}
 	}
 
-	~Sistema() {};
+	~Sistema() {
+		delete[] this->logs;
+		delete[] this->ordenados;
+	}
 
 };
 
