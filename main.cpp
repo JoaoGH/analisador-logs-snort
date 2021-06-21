@@ -2,8 +2,8 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include <time.h>
-#include <string.h>
+#include <ctime>
+#include <cstring>
 #include <iomanip>
 
 using namespace std;
@@ -625,7 +625,7 @@ public:
 			Node<T> *current = sorted;
 			while (current->getNext() != NULL && this->testAtribute(atributo, "<=", current->getNext()->getElement(), newNode->getElement())) {
 				if (this->testAtribute(atributo, "==", current->getNext()->getElement(), newNode->getElement())) {
-					if (this->testAtribute(atributo, ">", current->getNext()->getElement(), newNode->getElement())) {
+					if (current->getNext()->getElement()->getDataHora()->getTimeT() > newNode->getElement()->getDataHora()->getTimeT()) {
 						break;
 					}
 				}
@@ -776,7 +776,6 @@ public:
 			}
 			int atributoIntMid = NULL;
 			string atributoString = "";
-			int tam = NULL;
 			switch(atributo) {
 				case 1:
 					// DataHora
@@ -784,17 +783,14 @@ public:
 					break;
 				case 2:
 					// Codigo
-					tam = mid->getElement()->getCodigo().size() < value.size() ? mid->getElement()->getCodigo().size() : value.size();
 					atributoString = mid->getElement()->getCodigo();
 					break;
 				case 3:
 					// Mensagem
-					tam = mid->getElement()->getMensagem().size() < value.size() ? mid->getElement()->getMensagem().size() : value.size();
 					atributoString = mid->getElement()->getMensagem();
 					break;
 				case 4:
 					// Classificacao
-					tam = mid->getElement()->getClassificacao().size() < value.size() ? mid->getElement()->getClassificacao().size() : value.size();
 					atributoString = mid->getElement()->getClassificacao();
 					break;
 				case 5:
@@ -803,12 +799,10 @@ public:
 					break;
 				case 6:
 					// Protocolo
-					tam = mid->getElement()->getProtocolo().size() < value.size() ? mid->getElement()->getProtocolo().size() : value.size();
 					atributoString = mid->getElement()->getProtocolo();
 					break;
 				case 7:
 					// OrigemIP
-					tam = mid->getElement()->getOrigemIP().size() < value.size() ? mid->getElement()->getOrigemIP().size() : value.size();
 					atributoString = mid->getElement()->getOrigemIP();
 					break;
 				case 8:
@@ -817,7 +811,6 @@ public:
 					break;
 				case 9:
 					// DestinoIP
-					tam = mid->getElement()->getDestinoIP().size() < value.size() ? mid->getElement()->getDestinoIP().size() : value.size();
 					atributoString = mid->getElement()->getDestinoIP();
 					break;
 				case 10:
@@ -826,7 +819,6 @@ public:
 					break;
 			}
 			if (atributoString != "") {
-				// nao eh 100% precisa. funciona bem com IPs
 				if (strcmpi(atributoString.c_str(), value.c_str()) == 0) {
 					return mid;
 				} else if (strcmpi(atributoString.c_str(), value.c_str()) == -1) {
@@ -872,6 +864,7 @@ public:
 class Sistema {
 	LinkedList<Registro *> *logs;
 	LinkedList<Registro *> *ordenados;
+	int indexOrder = 0;
 	string dataInicial = "", dataFinal = "", horaInicial = "", horaFinal = "", codigo = "", mensagem = "", classificacao = "", protocolo = "", origemIP = "", destinoIP = "";
 	int prioridadeIni = -1, prioridadeFin = -1, portaOrigemIni = -1, portaOrigemFin = -1, portaDestinoIni = -1, portaDestinoFin = -1;
 public:
@@ -1490,14 +1483,10 @@ public:
 		}
 		string filtro;
 		cout << "Informe um filtro: " << endl;
-		cin >> filtro;
+		cin.ignore();
+		getline(cin, filtro);
 		Node<Registro *> *node = NULL;
-		for (int i = 1; i <= 10; i++) {
-			node = this->ordenados->binarySearch(i, filtro);
-			if (node != NULL) {
-				break;
-			}
-		}
+		node = this->ordenados->binarySearch(this->indexOrder, filtro);
 		if (node != NULL) {
 			cout << node->getElement()->toString() << endl;
 		} else {
@@ -1528,6 +1517,7 @@ public:
 				} while (atributo < 1 || atributo > 10);
 				this->ordenados->insertionSort(atributo);
 				this->ordenados->printlist();
+				this->indexOrder = atributo;
 				break;
 			case 2:
 				do {
