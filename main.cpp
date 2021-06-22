@@ -1413,6 +1413,7 @@ public:
 		Node<Registro *> *current = this->logs->getHead();
 		while (current != NULL) {
 			current->getElement()->setFiltro(true);
+			current = current->getNext();
 		}
 
 		this->dataInicial = "";
